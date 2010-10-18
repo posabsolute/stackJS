@@ -1,0 +1,159 @@
+Reference:
+1.FAQ
+2.Configurations
+3.Using the framework
+4.Conventions
+5.Working with the controller
+
+
+
+
+1. FAQ
+
+What is simpMVC?
+simpMVC is a small javascript framework that try to not get in your way, 
+while still giving you tools to write good and maintanable code.
+Model = All you AJAX call to the server
+View = creating html string and returning it to the controller
+Controller = All your DOM manipulation, and code in a general matter (beside AJAX calls, and html string concatenation)
+
+What Library simpMVC uses?
+None, you can use any library (even your own) with it. 
+In fact it also play well with php MVC frameworks, you are absolutely not obligated to use the view provided with the framework.
+
+Can you load more than one application at the same time?
+No, not currently.
+
+
+
+2. Configurations
+simpMVC relies on configuration files to understand your app. All configurations files should be added in simpMVC/conf
+You have one base configuration files and you can also use one configuration files per module.
+using this convention: conf.Modulename.js
+
+conf.global.js
+This file is the base configuration for your app.
+
+(function() {
+
+	simpMVC.environement = "developement";   // environement variable, developement or production 
+	
+	/* Load logs, CustomIElogs makes logs appears in a overflown div if the console is undefined */
+	simpMVC.logs = true;
+	simpMVC.CustomIElogs = true;
+	simpMVC.systemLogs = true;
+	
+	/* 	Enable Unit test, (not working for now)
+		you can test each models separatly  or all using "*"  */
+	simpMVC.test = false;
+	simpMVC.includeTest = [];
+	
+	/* Aplication path and name */
+	simpMVC.pluginPath = 'js/utility/'; 	// where are your plugin
+	simpMVC.applicationName = "Cooking";	// Your application name
+
+	simpMVC.librarySource = 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js';	// Using a library? will be loaded first
+	/* Load all your plugins dependencies here, they are loaded asynch for now */
+	simpMVC.Plugins = ['serializeObject.js','jquery.fixture.js'];
+	simpMVC.pluginsLoadAsynch = true;  // load all plugins asynch, without any particular order
+	
+	// Internal framework Files
+	simpMVC.loadFiles = [];	
+
+	simpMVC.modules = ["Recipe"] // load this modules, can be overwrited by parameters in the html
+	
+	/* Bypass the dependency system and load only one js file */
+	simpMVC.productionJSfile = [''] 
+	
+
+})()
+
+conf.Modulename.js
+
+Every module can use a configuration file where you can dictate plugin dependencies before the module is loaded
+You can also tell a different path to your module js files (can be useful when your js files are located in each modules folder of your php framework)
+Follow this convention: Applicationname.Conf.Module
+
+Example:
+Cooking.Conf.Recipe.jsModulePath = "";
+
+Cooking.Conf.Recipe.dependencies = ['jquery.easing.1.3.js','aop.min.js'];
+
+
+
+3. Using the framework
+
+The framework separate your javascript logic in 3. You can also refer to the recipe CRUD example provided with the framework
+
+Models, ApplicationName.Model.Module
+This is where your handle all your ajax calls, send and receive information form the server
+
+Controllers: ApplicationName.Controller.Module
+This is where you write all your code. Beside creating html string and templating engine.
+
+Views : ApplicationName.View.Module
+This is where your create your html strings that are returned to your controller to be added in the DOM.
+There is currently no templating engine.
+
+
+4. Conventions
+simpMVC have big hopes that you will follow some simple conventions to make code development and maintenance easier.
+
+Variable names:
+Javascript do not inforce variable type, this is why simpMVC recommend that you use the type as the first letter of your variables names.
+
+Examples:
+sString
+oObject(json)
+fFunction
+iInteger
+
+Event names:
+In javascript, we rely a lot on events linked to DOM nodes, this is why having a good policy in this domain help to understand what the events are actually doing.
+In a general way, it is recommended to follow this pattern
+[on][]
+
+Comments:
+simpMVC do not inforce any particular form of commenting as this changes a lot from team to team. 
+However, I advocate giving a good description of each method and applying ownership. Example:
+/**
+ * Responds to the create form being submitted by creating a new Recipe.
+ * @param {jQuery} el A jQuery wrapped element.
+ * @author Cedric Dugas
+ */
+
+
+
+5. Working in the controller
+
+Initiation:
+Once your module has been loaded, it will automatically execute the controller function. This is where you need to bind your events and observer.
+There is no observer pattern provided as most js library as some form of custom events that allows the same thing.
+An example:
+Cooking.Controller.Recipe = function () {
+	var _this = this;
+	$("form#addRecipeForm").live(	"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
+	$(".editRecipe").live(			"click",	function(){ _this.onEditRecipeClick(this);			return false; });
+	$(".destroyRecipe").live(		"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
+	
+	$(document).bind("Recipe.Created", function(){ _this.recipeCreatedObserver })
+	
+	this.load()
+};
+
+In the case up here, I need to cache the Controller object doing var _this = this; because once we are in a jquery Event callback function, "this" will always refer to the DOM object that triggered it. This is why you can't just do : $("form#addRecipeForm").live("submit", this.onFormAddRecipeSubmit). We also add "this" as a parameter, so you can have access to the DOM object that called the function.
+
+
+
+Calling a model:
+To call a model, you can do : this.Model.Method().
+The model can also receive a controller method callback in string to be executed once you have your server response, 
+then in your model you would do: this.callback(sMethodname, oData);
+
+However, in jquery for example, using $.ajax and the success function, "this" would refer to jquery and not our model object, so you need to cache the Model object with var _this = this at the bigenning of your method.
+
+Calling a view:
+To call a model, you can do : this.View.Method(). A view should always return a string with the html content needed, and in your controller you append that string to the DOM. Example : $("body").html(this.View.createDataGrid(oData))
+
+However, some of you might point out that most of the time, it's the server that return the HTML content (Specially in php MVC framework). So you have 2 choice here, advocate for next projects to use a javascript view for some of the content, of just skip the view all together. You receive the string and you callback the controller with what you need to append in your html.
+
