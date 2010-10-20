@@ -10,19 +10,21 @@
 	stackJS.CustomIElogs = true;
 	stackJS.systemLogs = true;
 	stackJS.logJSerrors = false;
+	stackJS.logJSerrorsURL = "http://localhost/logjserror.php"
 	
+	stackJS.configPath = "js/stackJS/conf/"
 	/* 	Enable Unit test, 
 		you can test each models separatly  or all using "*" NOT IMPLEMENTED */
 	stackJS.test = false;
 	stackJS.includeTest = [];
 	
-	
-	stackJS.pluginPath = 'js/utility/';  /* Application plugins repository path */
+
 	stackJS.applicationName = "Cooking"; /* Application name*/
 
 	stackJS.librarySource = 'js/utility/jquery.min.js';	
 	/* Load all your plugins dependencies here, they are loaded asynch for now */
-	stackJS.Plugins = ['serializeObject.js','jquery.fixture.js', "shit.js"];
+	stackJS.Plugins =  ['js/utility/serializeObject.js',
+						'js/utility/jquery.fixture.js'];
 	
 	// Internal framework Files, NOT IMPLEMENTED 
 	stackJS.loadFiles = [];	

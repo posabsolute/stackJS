@@ -149,7 +149,7 @@ var stackJS = {
 			console.systemLog("Loading plugin " + stackJS.pluginPath + stackJS.Plugins[i]);
 			//var callbackPlugin =
 			this.insertJSfiles({
-				path:stackJS.pluginPath,
+				path:"",
 				file:stackJS.Plugins[i],
 				callback:function(oParams){ stackJS.ObserverInsertPlugins(oParams) }
 			},{"pluginName": stackJS.Plugins[i]})
@@ -171,25 +171,21 @@ var stackJS = {
      */
 	loadModules: function(){
 		this.loadModulesObjects();
-		for (var i in stackJS.modules){
-			window[stackJS.applicationName]["Conf"][stackJS.modules[i]] = {};	// Create basic conf object for each module
-			
-			var moduleConfigUrl = "/stackJS/conf/conf." + stackJS.modules[i].toLowerCase() +  ".js";
-			var params = {
-				"moduleName": stackJS.modules[i],
-				"moduleConfigUrl": moduleConfigUrl
-			}
-			this.insertJSfiles({
-				path:this.configs.path,
-				file:moduleConfigUrl,
-				callback:function(oParams){ stackJS.confObserver(oParams.moduleName, oParams.moduleConfigUrl, params)}
-			}, params)
-		}
+		this.insertJSfiles({
+			path:stackJS.configPath,
+			file: "conf.modules.js",
+			callback:function(){ stackJS.confObserver() }
+		})
 	},	
-	confObserver : function(module, confFile, params){
-		console.systemLog("Module Configuration loaded: " + confFile);
-		if(typeof(window[stackJS.applicationName]["Conf"][module]["jsPath"]) != "undefined"){
-			var sModulePath = window[stackJS.applicationName]["Conf"][module]["jsPath"];
+	confObserver: function(){
+		for (var i in stackJS.modules){
+			this.moduleLoader(stackJS.modules[i])
+		}
+	},
+	moduleLoader : function(module){
+		console.systemLog("Modules Configuration loaded");
+		if(typeof(window[stackJS.applicationName]["Conf"][module]["jsModulePath"]) != "undefined"){
+			var sModulePath = window[stackJS.applicationName]["Conf"][module]["jsModulePath"];
 		}else{
 			var sModulePath = this.configs.path;
 		}
@@ -209,7 +205,7 @@ var stackJS = {
 		var addinlist = true;
 		for (var i in aDependencies){
 			for(var x in stackJS.Plugins){
-				if (aDependencies[i] == stackJS.Plugins[x])	addinlist= false
+				if (aDependencies[i] == stackJS.Plugins[x])	addinlist = false;
 			}
 			if(addinlist) {
 				stackJS.Plugins.push(aDependencies[i])
