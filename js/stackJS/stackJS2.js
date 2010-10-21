@@ -223,22 +223,28 @@ var stackJS = {
 	module : function() {
 		console.log(stackJS.module.Api)
 		var moduleData = {};
-		return{
-			Api: function() {
-				return{
-					callback:function(method){
+		stackJS.module.prototype.Api = function(sModule) {
+			return{
+				callback:function(method){
 
-					},
-					callReturn: function(moduleSection,method, oData){
-						console.log(sModule)
-						return moduleData[sModule][moduleSection].instance[method](oData)
-					}
+				},
+				callReturn: function(oDataCall){
+					return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData)
+					
+				},
+				callFunction: function(oDataCall){
+					//console.log(oDataCall.passData)
+					return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData)
+					
 				}
-			},
+			}
+		}	
+		return{
+		
 			register: function(moduleId, func){
 				if(!moduleData[moduleId[0]]){ 
 					moduleData[moduleId[0]] = {
-				        instance: null,
+				        instance: {},
 						creator: [moduleId[1]]
 				    };	
 					moduleData[moduleId[0]][moduleId[1]] = 	func;
@@ -251,9 +257,9 @@ var stackJS = {
 				for(var i in moduleData[moduleId].creator){
 					var moduleSection = moduleData[moduleId].creator[i];
 					
-				   	moduleData[moduleId][moduleSection].instance = moduleData[moduleId][moduleSection](stackJS.module.Api(moduleData[moduleId]));
-				    if(moduleData[moduleId][moduleSection].instance.load)
-						moduleData[moduleId][moduleSection].instance.load();
+				   	moduleData[moduleId]["instance"][moduleSection] = moduleData[moduleId][moduleSection](new stackJS.module.prototype.Api(moduleId));
+				    if(moduleData[moduleId]["instance"][moduleSection].load)
+						moduleData[moduleId]["instance"][moduleSection].load();
 				}
 			},
 		
@@ -285,4 +291,5 @@ var stackJS = {
 	}	
 };
 
-(function() { stackJS.init(); })()
+
+stackJS.init(); 
