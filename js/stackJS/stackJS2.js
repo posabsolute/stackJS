@@ -228,10 +228,6 @@ var stackJS = {
 				callback:function(method){
 
 				},
-				callReturn: function(oDataCall){
-					return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData)
-					
-				},
 				callFunction: function(oDataCall){
 					//console.log(oDataCall.passData)
 					return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData)

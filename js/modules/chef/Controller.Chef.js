@@ -25,7 +25,7 @@
 	    getRecipe: function(){
 			api.callFunction({
 				Class:["Model",'getRecipe'],
-				passData:["Controller",'listRecipe'] // CALLBACK
+				passData:{callback:["Controller",'listRecipe']} 
 			})
 	    },
 	    /**
@@ -33,7 +33,7 @@
 	     * @param {Array} aRecipes An array of Recipe objects.
 	     */
 	    listRecipe: function(aRecipes){
-	        $('#recipeList').html(api.callReturn({
+	        $('#recipeList').html(api.callFunction({
 									Class:["View","showListRecipe"],
 									passData:aRecipes
 								}))
@@ -44,8 +44,14 @@
 	     */
 	    onFormAddRecipeSubmit : function(el){
 	    	var jQdomForm = $(el);
-			var jNewRecipeData = jQdomForm.serializeObject();
-			this.Model.create(jNewRecipeData, "addRecipe")
+			var oNewRecipe = jQdomForm.serializeObject();
+			api.callFunction({
+				Class:["Model",'create'],
+				passData:{
+					callback:["Controller",'addRecipe'],
+					pushData:oNewRecipe
+				} 
+			})
 	        return false;
 	    },
 	    /**
@@ -53,7 +59,10 @@
 	     * @param {Object} oNewRecipe - new recipe object to be send to the view
 	     */
 	    addRecipe : function(oNewRecipe){
-	    	$('#recipeList').append(this.View.showAddRecipe(oNewRecipe));
+	    	$('#recipeList').append(api.callFunction({
+									Class:["View","showAddRecipe"],
+									passData:oNewRecipe
+								}))
 	    },
 	    /**
 	     * Creates and places the edit interface.
@@ -68,7 +77,13 @@
 	     */
 	    onDestroyRecipeClick : function(el){
 	        var deleteRecipeId = $(el).attr("datas")
-	        this.Model.destroy(deleteRecipeId, "destroyObserver")
+			api.callFunction({
+				Class:["Model",'destroy'],
+				passData:{
+					callback:["Controller",'destroyObserver'],
+					passData:deleteRecipeId
+				} 
+			})
 	        return false
 	    },
 	    /**
