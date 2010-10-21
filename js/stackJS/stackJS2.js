@@ -4,20 +4,12 @@
  */
  
 var stackJS = {
-	 /**
-     * Start Loading file configurations 
-     */
+	 /** 	Start Loading file configurations */
 	init: function(){
-		this.PluginLoaded = [];
-		this.modulesLoaded = [];
-		this.libraryLoad = false;
-		this.configs = {};
-		
+		this.Conf = {};
 		this.loadRequireJS();
 	},
-	 /**
-    * Load the require.js library taht will handle files insertion
-    */
+	 /**	Load the require.js library that will handle files insertion */
 	loadRequireJS : function(){
 		
 		var jsSrc  = document.getElementById("stackJS").src;
@@ -27,11 +19,10 @@ var stackJS = {
 		for(var i in jsQry){
 			var addConf = jsQry[i].split("=");
 			var addConfParams = addConf[1].split(",")
-			window["stackJS"]["configs"][addConf[0]] = addConfParams;
+			window["stackJS"]["Conf"][addConf[0]] = addConfParams;
 		}
-		
 		this.insertJSfiles({
-			path:this.configs.path + "stackJS/"	,
+			path:stackJS.Conf.stackJSpath,
 			file:'require.js',
 			callback:function(){stackJS.loadConfiguration();}
 		})
@@ -41,7 +32,7 @@ var stackJS = {
      * Load the global conf files
      */
 	loadConfiguration : function(){
-		var globalConf = this.configs.path+"stackJS/conf/conf.global.js"
+		var globalConf = stackJS.Conf.stackJSpath + "conf/conf.global.js"
 		require([globalConf], function() {
 			stackJS.loadMVC();
 		});
@@ -91,22 +82,20 @@ var stackJS = {
 	loadMVC : function(){
 		this.logging();
 		console.systemLog("conf.global.js loaded")
-		
-		if(stackJS.environement == "production"){
-			this.loadLProduction();
+		if(stackJS.Conf.environement == "production"){
+			this.loadProduction();
 		}else{
 			this.loadLibrary();
 		}
-		
 	},
 	/**
      *  Augment console.log habilities, enable console.log in old ie versions and correct ie crashing bug, 
      *  can be disabled from conf.global.js
      */
 	logging: function(){
-		if(this.logs){
+		if(this.Conf.logs){
 			if (typeof console == "undefined" || typeof console.log == "undefined"){
-				if(stackJS.CustomIElogs){
+				if(stackJS.Conf.customIElogs){
 					var debugHtml = document.createElement("div");
 					debugHtml.setAttribute("style","position:absolute; top:0; left:0; width:100%;height:200px; overflow:scroll;z-index:1000; display:block; filter:alpha(opacity=80); background:#000;");
 					debugHtml.setAttribute("id","debugMode")
@@ -126,7 +115,7 @@ var stackJS = {
 					console ={ systemLog:function(caller){alert(caller)}};
 				}
 			}else{
-				if(this.systemLogs){
+				if(this.Conf.systemLogs){
 					console.systemLog =  function( context ) { console.log( context) };
 				}else{
 					console.systemLog =  function(  ) {};
@@ -137,7 +126,7 @@ var stackJS = {
 				console = { log: function(loggin) {} };
 			}else{
 				console.log = function() {}; 	
-				console = { systemLog: function() {} };
+				console.systemLog =  function(  ) {};
 			}	
 		}	
 	},
@@ -145,16 +134,16 @@ var stackJS = {
      *  Load the javascript library of your choice
      */
 	loadLibrary: function(){
-		console.systemLog("Loading Library " + stackJS.librarySource);
+		console.systemLog("Loading Library " + stackJS.Conf.librarySource);
 		
-		require([stackJS.librarySource], function() {
+		require([stackJS.Conf.librarySource], function() {
 			stackJS.loadPlugins();
 		});
 
 	},	
 	loadPlugins: function(){
 		stackJS.libraryLoad = true; 
-		require(stackJS.Plugins, function() {
+		require(stackJS.Conf.Plugins, function() {
 			console.systemLog("System ready... loading MVC files");
 			stackJS.loadModules()
 		});
@@ -164,7 +153,7 @@ var stackJS = {
      */
 	loadModules: function(){
 		this.loadModulesObjects();
-		var sModuleConfigPath = stackJS.configPath + "conf.modules.js"
+		var sModuleConfigPath = stackJS.Conf.configPath + "conf.modules.js"
 		require([sModuleConfigPath], function(e) {
 			console.systemLog("conf.modules.js loaded");
 			stackJS.confObserver() 
@@ -175,21 +164,20 @@ var stackJS = {
      */
 	loadModulesObjects : function(){
 		this.includeType = ['Model',"View","Controller"];
-
-		window[stackJS.applicationName] = {};
-		window[stackJS.applicationName].Model = {};
-		window[stackJS.applicationName].Controller = {};
-		window[stackJS.applicationName].View = {};
-		window[stackJS.applicationName].Conf = {};
+	
+		window[stackJS.Conf.applicationName] = {};
+		window[stackJS.Conf.applicationName] = new stackJS.module;
+		window[stackJS.Conf.applicationName].Conf = {};
 	},		
 	confObserver: function(){
-		for (var i in stackJS.modules){
-			this.moduleLoader(stackJS.modules[i])
+		for (var i in stackJS.Conf.modules){
+			this.moduleLoader(stackJS.Conf.modules[i])
 		}
 	},
 	moduleLoader : function(module){
-
-		var aDependenciesFiles = window[stackJS.applicationName]["Conf"][module]["dependencies"];
+		if(!window[stackJS.Conf.applicationName]["Conf"][module]) console.systemLog("cannot find configuations for module: " + module)
+		
+		var aDependenciesFiles = window[stackJS.Conf.applicationName]["Conf"][module]["dependencies"];
 		if(typeof(aDependenciesFiles) != "undefined"){
 			this.loadDependencies(aDependenciesFiles,module)
 		}else{
@@ -212,45 +200,89 @@ var stackJS = {
      *  @param {String} sModule - Module name        
      */		
 	loadModuleFiles : function(sModule){
+
+		 
 		var aFilesModule = [];
-		var aModuleInclude = window[stackJS.applicationName]["Conf"][sModule]["moduleInclude"];
+		var aModuleInclude = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleInclude"];
 		if(aModuleInclude){
 			console.log(aModuleInclude)
-			var aLoadModuleFiles = window[stackJS.applicationName]["Conf"][sModule]["moduleInclude"];
+			var aLoadModuleFiles = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleInclude"];
 		}else{
 			var aLoadModuleFiles = this.includeType;
 		}
 		for(var x in aLoadModuleFiles){		
-			var fileUrl = this.includeType[x].toLowerCase() + "s/" +this.includeType[x]+ "." + sModule +  ".js";
-			aFilesModule.push(this.configs.path + fileUrl);
+			var fileUrl = sModule.toLowerCase() + "/" +this.includeType[x]+ "." + sModule +  ".js";
+			aFilesModule.push(this.Conf.modulePath + fileUrl);
 		}
 		require(aFilesModule, function() {
 			console.systemLog("Module ready, instanciating: " + sModule);
-			stackJS.loadInstanciations(sModule)
-		});
+			window[stackJS.Conf.applicationName].start(sModule)
+		}); 
+		/* */
 	},	
-	/**
-     *  Instantiate Model and View into controller for all modules, 
-     *  This make possible the use of this.Model, and this.View
-     *  load application
-     */
-	loadInstanciations: function(sModule){
+	module : function() {
+		console.log(stackJS.module.Api)
+		var moduleData = {};
+		return{
+			Api: function() {
+				return{
+					callback:function(method){
 
-		if(typeof(window[stackJS.applicationName]["Controller"][sModule]) == "undefined"){
-			console.systemLog("This module do not exist: "+ sModule);
-			return;
-		}
-		var cacheMapObject = window[stackJS.applicationName]["Controller"][sModule];	
-				
-		cacheMapObject["prototype"]["Model"] = new window[stackJS.applicationName]["Model"][sModule];	
-		cacheMapObject["prototype"]["Model"]["callback"] = function(fresolveMethod, oData){
-			cacheMapObject[fresolveMethod](oData);
+					},
+					callReturn: function(moduleSection,method, oData){
+						console.log(sModule)
+						return moduleData[sModule][moduleSection].instance[method](oData)
+					}
+				}
+			},
+			register: function(moduleId, func){
+				if(!moduleData[moduleId[0]]){ 
+					moduleData[moduleId[0]] = {
+				        instance: null,
+						creator: [moduleId[1]]
+				    };	
+					moduleData[moduleId[0]][moduleId[1]] = 	func;
+				}else{
+					moduleData[moduleId[0]][moduleId[1]] = 	func;
+					moduleData[moduleId[0]].creator.push(moduleId[1]);
+				}
+			},	
+			start: function(moduleId){
+				for(var i in moduleData[moduleId].creator){
+					var moduleSection = moduleData[moduleId].creator[i];
+					
+				   	moduleData[moduleId][moduleSection].instance = moduleData[moduleId][moduleSection](stackJS.module.Api(moduleData[moduleId]));
+				    if(moduleData[moduleId][moduleSection].instance.load)
+						moduleData[moduleId][moduleSection].instance.load();
+				}
+			},
+		
+			kill: function(moduleId){
+			    var data = moduleData[moduleId];
+			    if (data.instance){
+			        data.instance.destroy();
+			        data.instance = null;
+			    }
+			},
+
+			startAll: function(){
+			    for (var moduleId in moduleData){
+			        if (moduleData.hasOwnProperty(moduleId)){
+			            this.start(moduleId);
+			        }
+			    }
+			},
+		
+			killAll: function(){
+			    for (var moduleId in moduleData){
+			        if (moduleData.hasOwnProperty(moduleId)){
+			            this.stop(moduleId);
+			        }
+			    }
+			}
+
 		}	
-
-		cacheMapObject["prototype"]["View"] = new window[stackJS.applicationName]["View"][sModule];			
-		cacheMapObject = new window[stackJS.applicationName]["Controller"][sModule];
 	}	
 };
-
 
 (function() { stackJS.init(); })()

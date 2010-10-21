@@ -3,35 +3,37 @@
 
 (function() {
 
-	stackJS.environement = "developement";   // environement variable, developement or production 
+	stackJS.Conf.environement = "developement";   // environement variable, developement or production 
 	
 	/* Load logs, CustomIElogs makes logs appears in a overflown window if console is undifined */
-	stackJS.logs = true;
-	stackJS.CustomIElogs = true;
-	stackJS.systemLogs = true;
-	stackJS.logJSerrors = false;
-	stackJS.logJSerrorsURL = "http://localhost/logjserror.php"
+	stackJS.Conf.logs = true;
+	stackJS.Conf.customIElogs = true;
+	stackJS.Conf.systemLogs = true;
+	stackJS.Conf.logJSerrors = false;
+	stackJS.Conf.logJSerrorsURL = "http://localhost/logjserror.php"
 	
-	stackJS.configPath = "js/stackJS/conf/"
+	stackJS.Conf.configPath = "js/stackJS/conf/"
+	stackJS.Conf.modulePath = "js/modules/"
+	
 	/* 	Enable Unit test, 
 		you can test each models separatly  or all using "*" NOT IMPLEMENTED */
-	stackJS.test = false;
-	stackJS.includeTest = [];
+	stackJS.Conf.test = false;
+	stackJS.Conf.includeTest = [];
 	
 
-	stackJS.applicationName = "Cooking"; /* Application name*/
+	stackJS.Conf.applicationName = "Cooking"; /* Application name*/
 
-	stackJS.librarySource = 'js/utility/jquery.min.js';	
+	stackJS.Conf.librarySource = 'js/utility/jquery.min.js';	
 	/* Load all your plugins dependencies here, they are loaded asynch for now */
-	stackJS.Plugins =  ['js/utility/serializeObject.js',
+	stackJS.Conf.Plugins =  ['js/utility/serializeObject.js',
 						'js/utility/jquery.fixture.js'];
 	
 	// Internal framework Files, NOT IMPLEMENTED 
-	stackJS.loadFiles = [];	
+	stackJS.Conf.loadFiles = [];	
 
-	stackJS.modules = ["Recipe"]
+	stackJS.Conf.modules = ["Chef"]
 	
-	stackJS.productionJSfile = ['']
+	stackJS.Conf.productionJSfile = ['']
 	
 
 })()

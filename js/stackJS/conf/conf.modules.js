@@ -7,8 +7,17 @@
 
 /* RECIPE CONFIG */
 Cooking.Conf.Recipe = {
-	"dependencies":['js/utility/jquery.easing.1.3.js','js/utility/console.ie.js']
-	//"moduleInclude":["Model", "Controller", "View"]
+	//"moduleInclude":["Model", "Controller", "View"],
+	//"modulePathJS":"js/module/chef/",
+	"dependencies":['js/utility/jquery.easing.1.3.js']
 }
 
+
+
+/* RECIPE Chef */
+Cooking.Conf.Chef = {
+	//"moduleInclude":["Model", "Controller", "View"],
+	//"modulePathJS":"js/module/chef/",
+	"dependencies":['js/utility/jquery.easing.1.3.js']
+}
 
