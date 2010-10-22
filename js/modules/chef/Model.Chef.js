@@ -53,13 +53,13 @@ Cooking.register(["Chef","Model"], function(api) {
 	    destroy : function(oParams){
 	    	var _this =  this;
 	        $.ajax({
-	            url: '/recipes/'+id,
+	            url: '/recipes/'+oParams.passData,
 	            type: 'delete',
 	            dataType: 'json',
 	            success: function (){
 		    		api.callFunction({
 						Class:oParams.callback,
-						passData:oParams.pushData
+						passData:oParams.passData
 					})
 		    	},
 		    	 error: function(request, status, error) {
@@ -79,14 +79,13 @@ Cooking.register(["Chef","Model"], function(api) {
 	            url: '/recipes',
 	            type: 'post',
 	            dataType: 'json',
-				data: oParams.pushData
+				data: oParams.oNewRecipe,
 	             success: function (){
 		    		api.callFunction({
 						Class:oParams.callback,
-						passData:oParams.pushData
+						passData:oParams.oNewRecipe
 					})
 		    	},
-	            data:jNewRecipeData,
 	            fixture: "-restCreate" //uses $.fixture.restCreate for response.
 	        })
 	    }

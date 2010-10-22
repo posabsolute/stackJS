@@ -221,7 +221,6 @@ var stackJS = {
 		/* */
 	},	
 	module : function() {
-		console.log(stackJS.module.Api)
 		var moduleData = {};
 		stackJS.module.prototype.Api = function(sModule) {
 			return{
@@ -230,8 +229,15 @@ var stackJS = {
 				},
 				callFunction: function(oDataCall){
 					//console.log(oDataCall.passData)
-					return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData)
-					
+					if(typeof(moduleData[sModule]["instance"][oDataCall.Class[0]]) == "undefined"){
+						console.systemLog("Module undefined: " +oDataCall.Class[0] + " " +  oDataCall.Class[1]);
+						return false;
+					}
+					if(typeof(moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]]) == "undefined"){
+						console.systemLog("Module undefined: " +oDataCall.Class[0] + " " +  oDataCall.Class[1]);
+						return false;
+					}
+					return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData);
 				}
 			}
 		}	

@@ -13,10 +13,8 @@
 	    load: function(){
  		
 			var _this = this;
-			$("#addRecipeForm").bind(		"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
-		//	$(".editRecipe").live(			"click",	function(){ _this.onEditRecipeClick(this);			return false; });
-		//	$(".cancelAddRecipe").live(		"click", 	function(){ _this.onCancelAddRecipeClick(this);   	return false; });
-			$(".destroyRecipe").live(		"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
+			$("#addRecipeForm").bind(	"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
+			$(".destroyRecipe").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
 			this.getRecipe()
 	    },
 	 	/**
@@ -49,7 +47,7 @@
 				Class:["Model",'create'],
 				passData:{
 					callback:["Controller",'addRecipe'],
-					pushData:oNewRecipe
+					oNewRecipe:oNewRecipe
 				} 
 			})
 	        return false;
@@ -60,9 +58,9 @@
 	     */
 	    addRecipe : function(oNewRecipe){
 	    	$('#recipeList').append(api.callFunction({
-									Class:["View","showAddRecipe"],
-									passData:oNewRecipe
-								}))
+										Class:["View","showAddRecipe"],
+										passData:oNewRecipe
+									}))
 	    },
 	    /**
 	     * Creates and places the edit interface.
