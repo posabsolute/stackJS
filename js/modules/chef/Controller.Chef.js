@@ -1,5 +1,5 @@
 /**
- * Recipe Module, control adding, deleting and modifying recipes
+ * Recipe Module, control adding, deleting and modifying Chefs
  * 
  * @author Cedric Dugas
  */
@@ -8,89 +8,37 @@
 	return {
  
 	 	/**
-	     * When the page loads, gets all recipes to be displayed.
+	     * When the page loads, gets all chefs to be displayed.
 	     */
 	    load: function(){
- 		
 			var _this = this;
-			$("#addRecipeForm").bind(	"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
-			$(".destroyRecipe").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
-			this.getRecipe()
+			$(".destroyChef").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
+			this.getChef()
+			api.bridgeCall({
+				Class:["Recipe","Controller",'getRecipe'],
+				passData:{callback:["Controller",'listChef']} 
+			})
+			
 	    },
 	 	/**
-	     * When the page loads, gets all recipes to be displayed.
+	     * When the page loads, gets all chefs to be displayed.
 	     */
-	    getRecipe: function(){
+	    getChef: function(){
 			api.callFunction({
-				Class:["Model",'getRecipe'],
-				passData:{callback:["Controller",'listRecipe']} 
+				Class:["Model",'getChef'],
+				passData:{callback:["Controller",'listChef']} 
 			})
 	    },
 	    /**
-	     * Displays a list of recipes and the submit form.
-	     * @param {Array} aRecipes An array of Recipe objects.
+	     * Displays a list of chefs 
+	     * @param {Array} aChefs - An array of Chef objects.
 	     */
-	    listRecipe: function(aRecipes){
-	        $('#recipeList').html(api.callFunction({
-									Class:["View","showListRecipe"],
-									passData:aRecipes
-								}))
+	    listChef: function(aChefs){
+	        $('#chef').html(api.callFunction({
+								Class:["View","showListChef"],
+								passData:aChefs
+							}))
 	    },
-	    /**
-	     * Responds to the create form being submitted by creating a new Recipe.
-	     * @param {jQuery} el jQuery add recipe form wrapped element.
-	     */
-	    onFormAddRecipeSubmit : function(el){
-	    	var jQdomForm = $(el);
-			var oNewRecipe = jQdomForm.serializeObject();
-			api.callFunction({
-				Class:["Model",'create'],
-				passData:{
-					callback:["Controller",'addRecipe'],
-					oNewRecipe:oNewRecipe
-				} 
-			})
-	        return false;
-	    },
-	    /**
-	     * Responds to the create form being submitted by creating a new Recipe.
-	     * @param {Object} oNewRecipe - new recipe object to be send to the view
-	     */
-	    addRecipe : function(oNewRecipe){
-	    	$('#recipeList').append(api.callFunction({
-										Class:["View","showAddRecipe"],
-										passData:oNewRecipe
-									}))
-	    },
-	    /**
-	     * Creates and places the edit interface.
-	     */
-	    onEditRecipeClick : function(el){
-		
-	        return false;
-	    },
-	    /**
-	     *  Handle's clicking on a recipe's destroy link.
-	     *  @param {jQuery} el The recipe's delete link element.
-	     */
-	    onDestroyRecipeClick : function(el){
-	        var deleteRecipeId = $(el).attr("datas")
-			api.callFunction({
-				Class:["Model",'destroy'],
-				passData:{
-					callback:["Controller",'destroyObserver'],
-					passData:deleteRecipeId
-				} 
-			})
-	        return false
-	    },
-	    /**
-	     *  Listens for recipes being destroyed and removes them from being displayed.
-	     */
-	    destroyObserver : function(deleteRecipeId){
-	    	var domId = "#recipe"+deleteRecipeId;
-	        $(domId).remove();  //removes ALL elements
-	    }
 	}
 })
 

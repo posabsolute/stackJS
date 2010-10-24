@@ -9,15 +9,17 @@
 Cooking.Conf.Recipe = {
 	//"moduleInclude":["Model", "Controller", "View"],
 	//"modulePathJS":"js/module/chef/",
+	// "permissions":["chef"],	
 	"dependencies":['js/utility/jquery.easing.1.3.js']
 }
 
 
 
-/* RECIPE Chef */
+/* Chef CONFIG */
 Cooking.Conf.Chef = {
-	//"moduleInclude":["Model", "Controller", "View"],
-	//"modulePathJS":"js/module/chef/",
+	// "moduleInclude":["Model", "Controller", "View"],
+	// "modulePathJS":"js/module/chef/",
+	// "permissions":"*",
 	"dependencies":['js/utility/jquery.easing.1.3.js']
 }
 
