@@ -31,7 +31,7 @@
 	// Internal framework Files, NOT IMPLEMENTED 
 	stackJS.Conf.loadFiles = [];	
 
-	stackJS.Conf.modules = ["Chef"]
+	stackJS.Conf.modules = ["Recipe"]
 	
 	stackJS.Conf.productionJSfile = ['']
 	

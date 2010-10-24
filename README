@@ -9,7 +9,7 @@ Reference:
 2.Configurations
 3.Using the framework
 4.Conventions
-5.Working with the controller
+5.Working with the api
 
 
 
@@ -17,11 +17,21 @@ Reference:
 1. FAQ
 
 What is stackJS?
-stackJS is a small javascript framework that try to not get in your way, 
+stackJS is a small javascript framework that try to not get in your way
 while still giving you tools to write good and maintanable code.
-Model = All you AJAX call to the server
-View = creating html string and returning it to the controller
-Controller = All your DOM manipulation, and code in a general matter (beside AJAX calls, and html string concatenation)
+
+Modules
+A module is an independent unit of functionality on the page that is comprised of business logic and most often some UI. For this reason, it helps to think of modules as a combination of HTML, CSS, and JavaScript that represents a single part of the page. 
+
+Sandbox (api)
+When a module needs to communicate or interact outside of its particular area, it must request permission to do so. The sandbox object is a module's view into the outside world, and serves to keep the module loosely-coupled. By limiting the module's direct knowledge of other objects to just one, it's easy to remove the module or move it to another page. You can think of the sandbox object as a security guard to prevent the module from doing things it shouldn't. There may be one sandbox per module, or one sandbox that all modules share. It's less important how many of these objects exist and more important that the abstraction it provides is solid.
+
+
+Theorically, the sandbox is the only thing that have access and knoe about all module. When you work in a file module, you can't access
+anything from the applicastion without passing by the api, and the api wont let you call other modules, you cam however call anything whitin any files your module is controlling.
+There is no alot of functionnality in the api currently, but this is where there is the most work to do.
+
+
 
 What Library stackJS uses?
 None, you can use any library (even your own) with it. 
@@ -33,9 +43,8 @@ No, not currently.
 
 
 2. Configurations
-stackJS relies on configuration files to understand your app. All configurations files should be added in stackJS/conf
-You have one base configuration files and you can also use one configuration files per module.
-using this convention: conf.Modulename.js
+stackJS relies on configuration files to understand your app. 
+You have one base configuration files and one for your modules.
 
 conf.global.js
 This file is the base configuration for your app.
@@ -74,22 +83,29 @@ This file is the base configuration for your app.
 
 })()
 
-conf.Modulename.js
+conf.module.js
 
 Every module can use a configuration file where you can dictate plugin dependencies before the module is loaded
 You can also tell a different path to your module js files (can be useful when your js files are located in each modules folder of your php framework)
-Follow this convention: Applicationname.Conf.Module
+
 
 Example:
-Cooking.Conf.Recipe.jsModulePath = "";
 
-Cooking.Conf.Recipe.dependencies = ['jquery.easing.1.3.js','aop.min.js'];
+/* RECIPE CONFIG */
+Cooking.Conf.Recipe = {
+	"moduleInclude":["Model", "Controller", "View"],
+	"modulePathJS":"js/module/chef/",
+	"dependencies":['js/utility/jquery.easing.1.3.js']
+}
+* moduleInclude are the file type you want to add, you need to follow this pattern in the filename : type.modulename.js 
+
 
 
 
 3. Using the framework
 
-The framework separate your javascript logic. You can refer to the recipe CRUD example provided with the framework.
+The framework should help youseparate your javascript logic. You can refer to the recipe CRUD example provided with the framework.
+Personnaly I use something like this this:
 
 Models, ApplicationName.Model.Module
 This is where your handle all your ajax calls, send and receive information form the server
@@ -116,8 +132,13 @@ iInteger
 
 Event names:
 In javascript, we rely a lot on events linked to DOM nodes, this is why having a good policy in this domain help to understand what the events are actually doing.
-In a general way, it is recommended to follow this pattern
-[on][]
+In a general way, it is recommended to follow those patterns:
+
+[on][Event][Action]
+[on][Event][Dispatcher]
+[on][Dispatcher][Event]
+[on][Id][Event][Handler]
+
 
 Comments:
 stackJS do not in-force any particular form of commenting as this changes a lot from team to team. 
@@ -130,38 +151,44 @@ However, I advocate giving a good description of each method and applying owners
 
 
 
-5. Working in the controller
+5. Working With the api
 
 Initiation:
-Once your module has been loaded, it will automatically execute the controller function. This is where you need to bind your events and observer.
+Once your module has been loaded, it will automatically execute the load function if available. This is where you should bind your events and observer.
 There is no observer pattern provided as most js library as some form of custom events that allows the same thing.
 An example:
-Cooking.Controller.Recipe = function () {
-	var _this = this;
-	$("form#addRecipeForm").live(	"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
-	$(".editRecipe").live(			"click",	function(){ _this.onEditRecipeClick(this);			return false; });
-	$(".destroyRecipe").live(		"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
+Cooking.register(["Chef","Controller"], function(api) {
+	return {
+	 	/**
+	     * When the page loads, gets all recipes to be displayed.
+	     */
+	    load: function(){
+ 		
+			var _this = this;
+			$("#addRecipeForm").bind(	"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
+			$(".destroyRecipe").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
+			this.getRecipe()
+	    }
+	}
+})	
 	
-	$(document).bind("Recipe.Created", function(){ _this.recipeCreatedObserver })
-	
-	this.load()
-};
-
 In the case up here, I need to cache the Controller object doing var _this = this; because once we are in a jquery Event callback function, "this" will always refer to the DOM object that triggered it. This is why you can't just do : $("form#addRecipeForm").live("submit", this.onFormAddRecipeSubmit). We also add "this" as a parameter, so you can have access to the DOM object that called the function.
 
 
 
-Calling a model:
-To call a model, you can do : this.Model.Method().
-The model can also receive a controller method callback in string to be executed once you have your server response, 
-this.callback("Methodname", oData);
+Calling other public functions :
+To call another function whithin your module you need to use the callFunction method of the api, an example:
 
-However, in jquery for example, using $.ajax and the success function, "this" would refer to jquery and not our model object, so you need to cache the Model object with var _this = this at the bigenning of your method.
+	api.callFunction({
+		Class:["Model",'getRecipe'],
+		passData:{callback:["Controller",'listRecipe']} 
+	})
 
-Calling a view:
-To call a model, you can do : this.View.Method(). A view should always return a string with the html content needed, and in your controller you append that string to the DOM. Example : $("body").html(this.View.createDataGrid(oData))
+You use Class to tell the class and method to call, and passData to pass data to ther function called. 
+As you can see, you can't call other module directly, I entend to implement this later in the api.
 
-However, some of you might point out 2 thing 
+
+Some of you might point out:
 * There is no templating engine, 
 - well it's pretty easy to slot one in I think.
 *it's the server that return the HTML content (Specially in php MVC framework). 
