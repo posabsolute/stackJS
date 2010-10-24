@@ -5,7 +5,7 @@ Cooking.register(["Chef","Model"], function(api) {
 	return {
     	 /**
 	     * get all recipe's data.
-	     * @param {String,Function} fCallback a callback that indicates the next controller function to call.
+	     * @param {String,Function} oParams - a callback that indicates the next controller function to call.
 	     */
 	   	getChef : function(oParams){
 	   		var _this =  this;

@@ -14,11 +14,13 @@
 			var _this = this;
 			$(".destroyChef").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
 			this.getChef()
+			
+			/* Call example to another module, currently is blocked because permissions dictate Chef is not autorised to call Recipe directly
 			api.bridgeCall({
 				Class:["Recipe","Controller",'getRecipe'],
 				passData:{callback:["Controller",'listChef']} 
 			})
-			
+			*/
 	    },
 	 	/**
 	     * When the page loads, gets all chefs to be displayed.
@@ -38,7 +40,7 @@
 								Class:["View","showListChef"],
 								passData:aChefs
 							}))
-	    },
+	    }
 	}
 })
 

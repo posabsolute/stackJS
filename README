@@ -95,8 +95,10 @@ Example:
 Cooking.Conf.Recipe = {
 	"moduleInclude":["Model", "Controller", "View"],
 	"modulePathJS":"js/module/chef/",
+	"permissions":["chef"],		
 	"dependencies":['js/utility/jquery.easing.1.3.js']
 }
+* permissions take * or an array of module name as parameter, it enable you to call other modules
 * moduleInclude are the file type you want to add, you need to follow this pattern in the filename : type.modulename.js 
 
 
@@ -155,7 +157,7 @@ However, I advocate giving a good description of each method and applying owners
 
 Initiation:
 Once your module has been loaded, it will automatically execute the load function if available. This is where you should bind your events and observer.
-There is no observer pattern provided as most js library as some form of custom events that allows the same thing.
+There is no observer pattern provided as most js libraries have some form of custom events that allows the same thing.
 An example:
 Cooking.register(["Chef","Controller"], function(api) {
 	return {
@@ -185,7 +187,16 @@ To call another function whithin your module you need to use the callFunction me
 	})
 
 You use Class to tell the class and method to call, and passData to pass data to ther function called. 
-As you can see, you can't call other module directly, I entend to implement this later in the api.
+
+
+
+<h2>Call to other modules:</h2>
+api.bridgeCall({
+	Class:["Recipe","Controller",'getRecipe'],
+	passData:{callback:["Controller",'listChef']} 
+})
+* Permissions need to be set in order to call another module.
+
 
 
 Some of you might point out:
