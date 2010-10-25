@@ -5,7 +5,7 @@
 
 
 Reference:
-1.FAQ
+1.Basic
 2.Configurations
 3.Using the framework
 4.Conventions
@@ -14,7 +14,7 @@ Reference:
 
 
 
-1. FAQ
+1. Basic
 
 What is stackJS?
 stackJS is a small javascript framework that try to not get in your way
@@ -27,8 +27,8 @@ Sandbox (api)
 When a module needs to communicate or interact outside of its particular area, it must request permission to do so. The sandbox object is a module's view into the outside world, and serves to keep the module loosely-coupled. By limiting the module's direct knowledge of other objects to just one, it's easy to remove the module or move it to another page. You can think of the sandbox object as a security guard to prevent the module from doing things it shouldn't. There may be one sandbox per module, or one sandbox that all modules share. It's less important how many of these objects exist and more important that the abstraction it provides is solid.
 
 
-Theorically, the sandbox is the only thing that have access and knoe about all module. When you work in a file module, you can't access
-anything from the applicastion without passing by the api, and the api wont let you call other modules, you cam however call anything whitin any files your module is controlling.
+Theorically, the sandbox is the only thing that have access to all modules. When you work in a module, you can't access
+anything from the applicastion without passing by the api, and the api wont let you call other modules, you can however call anything whitin any files your module is controlling.
 There is no alot of functionnality in the api currently, but this is where there is the most work to do.
 
 
@@ -46,7 +46,7 @@ No, not currently.
 stackJS relies on configuration files to understand your app. 
 You have one base configuration files and one for your modules.
 
-conf.global.js
+js/stackJS/conf/conf.global.js
 This file is the base configuration for your app.
 
 (function() {
@@ -83,7 +83,7 @@ This file is the base configuration for your app.
 
 })()
 
-conf.module.js
+js/stackJS/conf/conf.module.js
 
 Every module can use a configuration file where you can dictate plugin dependencies before the module is loaded
 You can also tell a different path to your module js files (can be useful when your js files are located in each modules folder of your php framework)
@@ -198,10 +198,4 @@ api.bridgeCall({
 * Permissions need to be set in order to call another module.
 
 
-
-Some of you might point out:
-* There is no templating engine, 
-- well it's pretty easy to slot one in I think.
-*it's the server that return the HTML content (Specially in php MVC framework). 
-- So you have 2 choice here, advocate for next projects to use a javascript view for some of the content, of just skip the view all together. You receive the html string from the model and you callback the controller with what you need to append in your html.
 
