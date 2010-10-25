@@ -12,7 +12,7 @@
 	     */
 	    load: function(){
 			var _this = this;
-			$(".destroyChef").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
+			
 			this.getChef()
 			
 			/* Call example to another module, currently is blocked because permissions dictate Chef is not autorised to call Recipe directly
@@ -29,7 +29,7 @@
 			api.callFunction({
 				Class:["Model",'getChef'],
 				passData:{callback:["Controller",'listChef']} 
-			})
+			});
 	    },
 	    /**
 	     * Displays a list of chefs 
@@ -40,6 +40,7 @@
 								Class:["View","showListChef"],
 								passData:aChefs
 							}))
+			$.publish("Chef.List.Loaded");				
 	    }
 	}
 })

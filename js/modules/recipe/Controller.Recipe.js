@@ -15,6 +15,7 @@
 			var _this = this;
 			$("#addRecipeForm").bind(	"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
 			$(".destroyRecipe").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
+
 			this.getRecipe()
 	    },
 	 	/**
@@ -31,6 +32,7 @@
 	     * @param {Array} aRecipes An array of Recipe objects.
 	     */
 	    listRecipe: function(aRecipes){
+	    	oRecipeGlobal = aRecipes;
 	        $('#recipeList').html(api.callFunction({
 									Class:["View","showListRecipe"],
 									passData:aRecipes
@@ -63,13 +65,6 @@
 									}))
 	    },
 	    /**
-	     * Creates and places the edit interface.
-	     */
-	    onEditRecipeClick : function(el){
-		
-	        return false;
-	    },
-	    /**
 	     *  Handle's clicking on a recipe's destroy link.
 	     *  @param {jQuery} el The recipe's delete link element.
 	     */
@@ -86,9 +81,10 @@
 	    },
 	    /**
 	     *  Listens for recipes being destroyed and removes them from being displayed.
+	     *  @param {String} sDeleteRecipeId - The recipe's delete link element.	     
 	     */
-	    destroyObserver : function(deleteRecipeId){
-	    	var domId = "#recipe"+deleteRecipeId;
+	    destroyObserver : function(sDeleteRecipeId){
+	    	var domId = "#recipe"+sDeleteRecipeId;
 	        $(domId).remove();  //removes ALL elements
 	    }
 	}

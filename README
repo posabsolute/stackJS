@@ -107,7 +107,7 @@ Cooking.Conf.Recipe = {
 3. Using the framework
 
 The framework should help youseparate your javascript logic. You can refer to the recipe CRUD example provided with the framework.
-Personnaly I use something like this this:
+Personnaly I use something like this:
 
 Models, ApplicationName.Model.Module
 This is where your handle all your ajax calls, send and receive information form the server

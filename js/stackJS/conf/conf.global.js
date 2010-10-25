@@ -34,7 +34,7 @@
 
 	stackJS.Conf.modules = ["Recipe", "Chef"]
 	
-	//stackJS.Conf.productionJSfile = ['']
+	// stackJS.Conf.productionJSfile = ['']
 	
 
 })()
