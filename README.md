@@ -1,21 +1,20 @@
 
  NOT READY TO BE USE
 
-
-
-
 Reference:
+
 1.Basic
+
 2.Configurations
+
 3.Using the framework
+
 4.Conventions
+
 5.Working with the api
 
 
-
-
 # 1. Basic
-
 What is stackJS?
 stackJS is a small javascript framework that try to not get in your way
 while still giving you tools to write good and maintanable code.
@@ -191,10 +190,12 @@ You use Class to tell the class and method to call, and passData to pass data to
 
 
 ## Call to other modules:
+
 api.bridgeCall({
 	Class:["Recipe","Controller",'getRecipe'],
 	passData:{callback:["Controller",'listChef']} 
 })
+
 * Permissions need to be set in order to call another module.
 
 
