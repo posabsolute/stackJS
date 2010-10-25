@@ -136,8 +136,11 @@ In javascript, we rely a lot on events linked to DOM nodes, this is why having a
 In a general way, it is recommended to follow those patterns:
 
 [on][Event][Action]
+
 [on][Event][Dispatcher]
+
 [on][Dispatcher][Event]
+
 [on][Id][Event][Handler]
 
 
