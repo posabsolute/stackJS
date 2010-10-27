@@ -28,7 +28,7 @@ var stackJS = {
 		})
 	},
  	/**
- 	 * Gets the params for the file url
+ 	 * Gets the params for the file url 
      * Load the global conf files
      */
 	loadConfiguration : function(){

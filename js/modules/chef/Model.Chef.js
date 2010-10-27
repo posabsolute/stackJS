@@ -1,7 +1,7 @@
 
 Cooking.register(["Chef","Model"], function(api) {
 
-
+ 
 	return {
     	 /**
 	     * get all recipe's data.

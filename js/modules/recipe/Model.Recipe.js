@@ -1,6 +1,6 @@
 
 Cooking.register(["Recipe","Model"], function(api) {
-
+ 
 
 	return {
     	 /**

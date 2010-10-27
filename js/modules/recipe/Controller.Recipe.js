@@ -4,7 +4,7 @@
  * @author Cedric Dugas
  */
  Cooking.register(["Recipe","Controller"], function(api) {
-
+ 
 	return {
  
 	 	/**

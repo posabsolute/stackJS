@@ -12,7 +12,7 @@
 	     */
 	    load: function(){
 			var _this = this;
-			
+			 
 			this.getChef()
 			
 			/* Call example to another module, currently is blocked because permissions dictate Chef is not autorised to call Recipe directly

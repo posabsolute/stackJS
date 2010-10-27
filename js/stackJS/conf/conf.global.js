@@ -2,7 +2,7 @@
 
 
 (function() {
-
+  
 	stackJS.Conf.environement = "developement";   // environement variable, developement or production 
 	
 	/* Load logs, CustomIElogs makes logs appears in a overflown window if console is undifined */

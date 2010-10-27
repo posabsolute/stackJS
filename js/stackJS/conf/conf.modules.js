@@ -12,7 +12,7 @@ Cooking.Conf.Recipe = {
 	// "permissions":["chef"],	
 	"dependencies":['js/utility/jquery.easing.1.3.js']
 }
-
+ 
 
 
 /* Chef CONFIG */

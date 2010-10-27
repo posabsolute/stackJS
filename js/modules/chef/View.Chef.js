@@ -1,7 +1,7 @@
 
 Cooking.register(["Chef","View"], function(api) {
 
-
+ 
 	return {
  
 	    showListChef : function (data) {

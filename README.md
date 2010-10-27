@@ -126,7 +126,7 @@ stackJS have big hopes that you will follow some simple conventions to make code
 Javascript do not inforce variable type, this is why stackJS recommend that you use the type as the first letter of your variables names.
 
 Examples:
-sString
+sString 
 oObject(json)
 fFunction
 iInteger

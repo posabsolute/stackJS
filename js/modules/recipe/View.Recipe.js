@@ -1,7 +1,7 @@
 
 Cooking.register(["Recipe","View"], function(api) {
 
-
+ 
 	return {
  
 	    showListRecipe : function (data) {
