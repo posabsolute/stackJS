@@ -21,7 +21,7 @@
 		you can test each models separatly  or all using "*" NOT IMPLEMENTED */
 	stackJS.Conf.test = false;
 	stackJS.Conf.includeTests = [];
-	
+	stackJS.Conf.moduleClassNames= ["Model","Controller","View"]
 
 	stackJS.Conf.applicationName = "Cooking"; /* Application name*/
 

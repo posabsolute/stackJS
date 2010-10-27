@@ -163,7 +163,8 @@ var stackJS = {
      *  Create base objects for the application
      */
 	loadModulesObjects : function(){
-		this.includeType = ['Model',"View","Controller"];
+		if(typeof(this.Conf.moduleClassNames) == "undefined") this.Conf.moduleClassNames = ['Model',"View","Controller"];
+		
 	
 		window[stackJS.Conf.applicationName] = {};
 		window[stackJS.Conf.applicationName] = new stackJS.module;
@@ -203,15 +204,14 @@ var stackJS = {
 
 		 
 		var aFilesModule = [];
-		var aModuleInclude = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleInclude"];
-		if(aModuleInclude){
-			console.log(aModuleInclude)
-			var aLoadModuleFiles = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleInclude"];
+		var aModuleClassNames = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleClassNames"];
+		if(aModuleClassNames){
+			var aLoadModuleFiles = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleClassNames"];
 		}else{
-			var aLoadModuleFiles = this.includeType;
+			var aLoadModuleFiles = this.Conf.moduleClassNames;
 		}
 		for(var x in aLoadModuleFiles){		
-			var fileUrl = sModule.toLowerCase() + "/" +this.includeType[x]+ "." + sModule +  ".js";
+			var fileUrl = sModule.toLowerCase() + "/" +this.Conf.moduleClassNames[x]+ "." + sModule +  ".js";
 			aFilesModule.push(this.Conf.modulePath + fileUrl);
 		}
 		require(aFilesModule, function() {
