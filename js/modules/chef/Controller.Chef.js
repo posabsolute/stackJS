@@ -15,12 +15,13 @@
 			 
 			this.getChef()
 			
-			/* Call example to another module, currently is blocked because permissions dictate Chef is not autorised to call Recipe directly
+			/* Call example to another module, currently is blocked because permissions dictate Chef is not autorised to call Recipe directly */
 			api.bridgeCall({
 				Class:["Recipe","Controller",'getRecipe'],
 				passData:{callback:["Controller",'listChef']} 
 			})
-			*/
+			api.loadModule("Recipe")
+			/* */
 	    },
 	 	/**
 	     * When the page loads, gets all chefs to be displayed.

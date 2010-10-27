@@ -130,6 +130,21 @@ var stackJS = {
 			}	
 		}	
 	},
+	isset: function(object, props){
+		var dump;
+		try {
+			for(var x in props){
+				if(x == 0) {
+					dump = object[props[x]];
+					break;
+				}
+				dump = dump[props[x]];
+			}
+		} catch(e) {
+		    return false;
+		}
+		return true;	
+	},
 	/**
      *  Load the javascript library of your choice
      */
@@ -176,6 +191,7 @@ var stackJS = {
 		}
 	},
 	moduleLoader : function(module){
+		
 		if(!window[stackJS.Conf.applicationName]["Conf"][module]) console.systemLog("cannot find configuations for module: " + module)
 		
 		var aDependenciesFiles = window[stackJS.Conf.applicationName]["Conf"][module]["dependencies"];
@@ -201,8 +217,6 @@ var stackJS = {
      *  @param {String} sModule - Module name        
      */		
 	loadModuleFiles : function(sModule){
-
-		 
 		var aFilesModule = [];
 		var aModuleClassNames = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleClassNames"];
 		if(aModuleClassNames){
@@ -225,43 +239,53 @@ var stackJS = {
 		stackJS.module.prototype.Api = function(sModule) {
 			return{
 				bridgeCall:function(oDataCall){
+					if(this.checkPermission(sModule, oDataCall)){
+						return moduleData[oDataCall.Class[0]]["instance"][oDataCall.Class[1]][oDataCall.Class[2]](oDataCall.passData);
+					}
+				},
+				callFunction: function(oDataCall){
+					if(stackJS.isset(moduleData[sModule]["instance"], oDataCall.Class)){
+						return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData);
+					}else{
+						console.systemLog("Class undefined: " +oDataCall.Class[0] + " " +  oDataCall.Class[1]);
+						return false;
+					}
+				},
+				loadModule : function(sNewModule){
+					if(moduleData.hasOwnProperty(sNewModule)){
+						console.systemLog("Module already loaded: " + sNewModule);
+						if(!moduleData[sNewModule].instance){
+							stackJS.module.start(sNewModule)
+						}else{
+							console.systemLog("Module already instanciated: " + sNewModule);
+						}
+					}else{
+						stackJS.moduleLoader(sNewModule);
+						console.systemLog("Loading module: " + sNewModule + " from " + sModule);
+					}
+					
+				}, 
+				checkPermission : function(sModule, oDataCall){
 					if(typeof(window[stackJS.Conf.applicationName]["Conf"][sModule]["permissions"]) == "undefined"){
 						console.systemLog("Access denied to: " + oDataCall.Class[0])
-						console.systemLog("Check your configuration permissions, maybe you should not do that");
+						console.systemLog("No permission set");
 						return false;
 					}else{
 						var sPermisions = window[stackJS.Conf.applicationName]["Conf"][sModule]["permissions"]
 						if(sPermisions == "*"){
-							console.systemLog("Accessing: " + oDataCall.Class[0] + " " + oDataCall.Class[1] + " " + oDataCall.Class[2]);
-							return moduleData[oDataCall.Class[0]]["instance"][oDataCall.Class[1]][oDataCall.Class[2]](oDataCall.passData);
+							 console.systemLog("Access Granted: " + oDataCall.Class[0]);
+							return true
 						}else{
-							var bAccess = false;
-							for (var i in sPermisions){
-								if(sPermisions[i] == oDataCall.Class[0]) {
-									return moduleData[oDataCall.Class[0]]["instance"][oDataCall.Class[1]][oDataCall.Class[2]](oDataCall.passData); 	
-									break;
-								}
-								
-							}
-							if(bAccess == false){
+							if(oDataCall.Class[0] in sPermisions) {
+								console.systemLog("Access Granted: " + oDataCall.Class[0]);
+								return true; 	
+							}else{
 								console.systemLog("Access denied to: " + oDataCall.Class[0])
 								console.systemLog("Check your configuration permissions, maybe you should not have access");
+								return false;
 							}
-							return false;
 						}
 					}
-				},
-				callFunction: function(oDataCall){
-					//console.log(oDataCall.passData)
-					if(typeof(moduleData[sModule]["instance"][oDataCall.Class[0]]) == "undefined"){
-						console.systemLog("Module undefined: " +oDataCall.Class[0] + " " +  oDataCall.Class[1]);
-						return false;
-					}
-					if(typeof(moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]]) == "undefined"){
-						console.systemLog("Module undefined: " +oDataCall.Class[0] + " " +  oDataCall.Class[1]);
-						return false;
-					}
-					return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData);
 				}
 			}
 		}	
@@ -308,7 +332,7 @@ var stackJS = {
 			killAll: function(){
 			    for (var moduleId in moduleData){
 			        if (moduleData.hasOwnProperty(moduleId)){
-			            this.stop(moduleId);
+			            this.kill(moduleId);
 			        }
 			    }
 			}

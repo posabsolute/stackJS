@@ -21,6 +21,8 @@
 		you can test each models separatly  or all using "*" NOT IMPLEMENTED */
 	stackJS.Conf.test = false;
 	stackJS.Conf.includeTests = [];
+	
+	/* global Class Names, can be overwritten per module */
 	stackJS.Conf.moduleClassNames= ["Model","Controller","View"]
 
 	stackJS.Conf.applicationName = "Cooking"; /* Application name*/

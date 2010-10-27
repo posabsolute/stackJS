@@ -17,6 +17,7 @@
 			$(".destroyRecipe").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
 
 			this.getRecipe()
+			
 	    },
 	 	/**
 	     * When the page loads, gets all recipes to be displayed.

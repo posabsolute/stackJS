@@ -17,9 +17,9 @@ Cooking.Conf.Recipe = {
 
 /* Chef CONFIG */
 Cooking.Conf.Chef = {
-	// "moduleClassNames":["Model", "Controller", "View"],
-	// "modulePathJS":"js/module/chef/",
-	// "permissions":"*",
+ // "moduleClassNames":["Model", "Controller", "View"],
+ // "modulePathJS":"js/module/chef/",
+	"permissions": "*",
 	"dependencies":['js/utility/jquery.easing.1.3.js']
 }
 
