@@ -87,7 +87,6 @@ This file is the base configuration for your app.
         stackJS.loadFiles = [];	
         
         stackJS.modules = ["Recipe"] // load this modules, can be overwrited by loadModules in the html
-        
    })()
 
 ## js/stackJS/conf/conf.modules.js
