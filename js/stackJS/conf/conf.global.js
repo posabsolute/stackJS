@@ -34,6 +34,18 @@
 							 'js/utility/pubsub.js'];
 
 
+	/* Extras are plugins for stackJS and NOT for the app */
+	stackJS.Conf.Extras = ["Sammy","Router"]
+	
+	stackJS.Conf.Extras.Sammy = {
+		jsPath : stackJS.Conf.jsPath + "sammy/",
+		file: "sammy-latest.min.js"
+	}
+	stackJS.Conf.Extras.Router = {
+		jsPath : stackJS.Conf.configPath,
+		file: "router.js"
+	}
+
 	stackJS.Conf.modules = ["Recipe", "Chef"]
 	
 	// stackJS.Conf.productionJSfile = ['']

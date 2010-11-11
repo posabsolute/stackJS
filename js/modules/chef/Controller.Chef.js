@@ -15,13 +15,15 @@
 			 
 			this.getChef()
 			
-			/* Call example to another module, currently is blocked because permissions dictate Chef is not autorised to call Recipe directly */
-			api.bridgeCall({
+		/*  Call example to another module, currently is blocked because permissions dictate Chef is not autorised to call Recipe directly */
+		/*	api.bridgeCall({
 				Class:["Recipe","Controller",'getRecipe'],
 				passData:{callback:["Controller",'listChef']} 
 			})
-			api.loadModule("Recipe")
-			/* */
+		
+		/* */
+		//	api.loadModule("Recipe")
+				
 	    },
 	 	/**
 	     * When the page loads, gets all chefs to be displayed.
@@ -31,6 +33,7 @@
 				Class:["Model",'getChef'],
 				passData:{callback:["Controller",'listChef']} 
 			});
+			
 	    },
 	    /**
 	     * Displays a list of chefs 
@@ -41,8 +44,11 @@
 								Class:["View","showListChef"],
 								passData:aChefs
 							}))
-			$.publish("Chef.List.Loaded");				
+			$.publish("Chef.List.Loaded");	
+			api.killModule("Recipe");			
 	    }
+		
+	
 	}
 })
 

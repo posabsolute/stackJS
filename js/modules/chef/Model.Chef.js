@@ -19,11 +19,7 @@ Cooking.register(["Chef","Model"], function(api) {
 						Class:oParams.callback,
 						passData:oReceivedData
 					})
-		    	},
-		    	 error: function(request, status, error) {
-	               console.log(error)
-	            }
-
+		    	}
 	        })
 	    }
  	}

@@ -18,6 +18,10 @@
 
 			this.getRecipe()
 			
+			api.registerDestroy(function (){
+				$("#addRecipeForm,.destroyRecipe").die();
+				$("#recipe").remove();
+			})
 	    },
 	 	/**
 	     * When the page loads, gets all recipes to be displayed.
@@ -88,6 +92,7 @@
 	    	var domId = "#recipe"+sDeleteRecipeId;
 	        $(domId).remove();  //removes ALL elements
 	    }
+		
 	}
 })
 

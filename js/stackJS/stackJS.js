@@ -130,20 +130,36 @@ var stackJS = {
 			}	
 		}	
 	},
+	/**
+     * Check is object exist
+     * @param {Object} object - the object to look into
+     * @param {Array} aProps - properties to check
+     */
 	isset: function(object, props){
-		var dump;
-		try {
-			for(var x in props){
-				if(x == 0) {
-					dump = object[props[x]];
-					break;
-				}
-				dump = dump[props[x]];
+		// we will use the dump variable to iterate in the object
+		var dump,
+			propsLength = props.length -1;
+		// loop in the properties 
+		for(x=0;x<props.length;x++){
+			// first prop?
+			if(x == 0) {
+				// add the object to dump (object.props1)
+				dump = object[props[x]];
+				continue;
 			}
-		} catch(e) {
-		    return false;
-		}
-		return true;	
+
+			// Undefined? return false
+			if(!dump || typeof dump == "undefined" || typeof dump[props[x]] == "undefined"){
+				return false;
+			}else{
+				// move in the object level 
+				// object.props1.props2
+				// object.props1.props2.props3
+				dump = dump[props[x]];
+				// return true, of even return the object back
+				if(x == propsLength) return dump;
+			}
+		}	
 	},
 	/**
      *  Load the javascript library of your choice
@@ -186,8 +202,9 @@ var stackJS = {
 		window[stackJS.Conf.applicationName].Conf = {};
 	},		
 	confObserver: function(){
+		if(stackJS.Conf.loadModules) stackJS.Conf.modules = stackJS.Conf.loadModules;
 		for (var i in stackJS.Conf.modules){
-			this.moduleLoader(stackJS.Conf.modules[i])
+			this.moduleLoader(stackJS.Conf.modules[i]);
 		}
 	},
 	moduleLoader : function(module){
@@ -196,7 +213,7 @@ var stackJS = {
 		
 		var aDependenciesFiles = window[stackJS.Conf.applicationName]["Conf"][module]["dependencies"];
 		if(typeof(aDependenciesFiles) != "undefined"){
-			this.loadDependencies(aDependenciesFiles,module)
+			this.loadDependencies(aDependenciesFiles,module);
 		}else{
 			this.loadModuleFiles(module);
 		}
@@ -234,8 +251,61 @@ var stackJS = {
 		}); 
 		/* */
 	},	
+	/**
+	 *  Handle Module instantiations and states
+     *  Sandbox core, handle public methods that modules can access    
+     */
 	module : function() {
-		var moduleData = {};
+		var moduleData = {},
+		    destroyData = {};
+		
+		function register(moduleId, func){
+			if(!moduleData[moduleId[0]]){ 
+				moduleData[moduleId[0]] = {
+			        instance: {},
+					creator: [moduleId[1]]
+			    };	
+				moduleData[moduleId[0]][moduleId[1]] = 	func;
+			}else{
+				moduleData[moduleId[0]][moduleId[1]] = 	func;
+				moduleData[moduleId[0]].creator.push(moduleId[1]);
+			}
+		}
+		function destroy(sModuleToDestroy){
+		    var data = moduleData[sModuleToDestroy];
+		    if (data.instance){
+		        data.instance = null;
+				if (destroyData[sModuleToDestroy]){
+					for(var i=0; i< destroyData[sModuleToDestroy].length; i++){
+						destroyData[sModuleToDestroy][i]();
+					}
+				}
+		    }
+		}
+		function start(moduleId){
+			for(var i in moduleData[moduleId].creator){
+				var moduleSection = moduleData[moduleId].creator[i];
+				
+			   	moduleData[moduleId]["instance"][moduleSection] = moduleData[moduleId][moduleSection](new stackJS.module.prototype.Api(moduleId));
+			    if(moduleData[moduleId]["instance"][moduleSection].load)
+					moduleData[moduleId]["instance"][moduleSection].load();
+			}
+		}
+		function startAll(){
+		    for (var moduleId in moduleData){
+		        if (moduleData.hasOwnProperty(moduleId)){
+		            this.start(moduleId);
+		        }
+		    }
+		}
+	
+		function killAll(){
+		    for (var moduleId in moduleData){
+		        if (moduleData.hasOwnProperty(moduleId)){
+		            this.kill(moduleId);
+		        }
+		    }
+		}
 		stackJS.module.prototype.Api = function(sModule) {
 			return{
 				bridgeCall:function(oDataCall){
@@ -244,7 +314,7 @@ var stackJS = {
 					}
 				},
 				callFunction: function(oDataCall){
-					if(stackJS.isset(moduleData[sModule]["instance"], oDataCall.Class)){
+					if(stackJS.isset(moduleData[sModule],["instance",oDataCall.Class[0],oDataCall.Class[1]])){
 						return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData);
 					}else{
 						console.systemLog("Class undefined: " +oDataCall.Class[0] + " " +  oDataCall.Class[1]);
@@ -255,7 +325,8 @@ var stackJS = {
 					if(moduleData.hasOwnProperty(sNewModule)){
 						console.systemLog("Module already loaded: " + sNewModule);
 						if(!moduleData[sNewModule].instance){
-							stackJS.module.start(sNewModule)
+							start(sNewModule)
+							console.systemLog("Instancing: " + sNewModule);
 						}else{
 							console.systemLog("Module already instanciated: " + sNewModule);
 						}
@@ -265,6 +336,19 @@ var stackJS = {
 					}
 					
 				}, 
+				registerDestroy : function(fCallback) {
+					if (!destroyData[sModule]) destroyData[sModule] = [];
+					destroyData[sModule].push(fCallback)
+				},
+				killModule : function(sModuleToDestroy){
+					if(moduleData.hasOwnProperty(sModuleToDestroy)){
+						destroy(sModuleToDestroy)
+						console.systemLog("Module killed: " + sModuleToDestroy);
+					}else{
+						console.systemLog("Module does not exist: " + sModuleToDestroy);
+					}
+					
+				},
 				checkPermission : function(sModule, oDataCall){
 					if(typeof(window[stackJS.Conf.applicationName]["Conf"][sModule]["permissions"]) == "undefined"){
 						console.systemLog("Access denied to: " + oDataCall.Class[0])
@@ -288,55 +372,14 @@ var stackJS = {
 					}
 				}
 			}
-		}	
+		}
+		
 		return{
-		
-			register: function(moduleId, func){
-				if(!moduleData[moduleId[0]]){ 
-					moduleData[moduleId[0]] = {
-				        instance: {},
-						creator: [moduleId[1]]
-				    };	
-					moduleData[moduleId[0]][moduleId[1]] = 	func;
-				}else{
-					moduleData[moduleId[0]][moduleId[1]] = 	func;
-					moduleData[moduleId[0]].creator.push(moduleId[1]);
-				}
-			},	
-			start: function(moduleId){
-				for(var i in moduleData[moduleId].creator){
-					var moduleSection = moduleData[moduleId].creator[i];
-					
-				   	moduleData[moduleId]["instance"][moduleSection] = moduleData[moduleId][moduleSection](new stackJS.module.prototype.Api(moduleId));
-				    if(moduleData[moduleId]["instance"][moduleSection].load)
-						moduleData[moduleId]["instance"][moduleSection].load();
-				}
-			},
-		
-			kill: function(moduleId){
-			    var data = moduleData[moduleId];
-			    if (data.instance){
-			        data.instance.destroy();
-			        data.instance = null;
-			    }
-			},
-
-			startAll: function(){
-			    for (var moduleId in moduleData){
-			        if (moduleData.hasOwnProperty(moduleId)){
-			            this.start(moduleId);
-			        }
-			    }
-			},
-		
-			killAll: function(){
-			    for (var moduleId in moduleData){
-			        if (moduleData.hasOwnProperty(moduleId)){
-			            this.kill(moduleId);
-			        }
-			    }
-			}
-
+			destroy:destroy,
+			register: register,	
+			start: start,
+			startAll:startAll,
+			killAll: killAll
 		}	
 	}	
 };
