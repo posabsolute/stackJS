@@ -258,7 +258,11 @@ var stackJS = {
 	module : function() {
 		var moduleData = {},
 		    destroyData = {};
-		
+		/**
+	     *  Register modules and add it in a creator object waiting to get instancied
+	     *  @param {String} moduleId - Module name 
+		 *  @param {String} func - Class name        
+	     */
 		function register(moduleId, func){
 			if(!moduleData[moduleId[0]]){ 
 				moduleData[moduleId[0]] = {
@@ -271,6 +275,10 @@ var stackJS = {
 				moduleData[moduleId[0]].creator.push(moduleId[1]);
 			}
 		}
+		/**
+	     *  Destroy module instance, it still keep it in the creator;
+	     *  @param {String} sModuleToDestroy - Module name  
+	     */
 		function destroy(sModuleToDestroy){
 		    var data = moduleData[sModuleToDestroy];
 		    if (data.instance){
@@ -282,23 +290,33 @@ var stackJS = {
 				}
 		    }
 		}
+		/**
+	     *  Create module instance and load load() function if available in each class module
+	     *  @param {String} moduleId - Module name  
+	     */
 		function start(moduleId){
 			for(var i in moduleData[moduleId].creator){
 				var moduleSection = moduleData[moduleId].creator[i];
+				if(!moduleData[moduleId]["instance"]) moduleData[moduleId]["instance"] = {};
 				
 			   	moduleData[moduleId]["instance"][moduleSection] = moduleData[moduleId][moduleSection](new stackJS.module.prototype.Api(moduleId));
-			    if(moduleData[moduleId]["instance"][moduleSection].load)
+				if(moduleData[moduleId]["instance"][moduleSection].load)
 					moduleData[moduleId]["instance"][moduleSection].load();
 			}
 		}
+		/**
+	     *  Start all module, only reference function start()
+	     */
 		function startAll(){
 		    for (var moduleId in moduleData){
 		        if (moduleData.hasOwnProperty(moduleId)){
-		            this.start(moduleId);
+		            start(moduleId);
 		        }
 		    }
 		}
-	
+		/**
+	     *  Kill all module, only reference function destroy()
+	     */
 		function killAll(){
 		    for (var moduleId in moduleData){
 		        if (moduleData.hasOwnProperty(moduleId)){
@@ -306,13 +324,25 @@ var stackJS = {
 		        }
 		    }
 		}
+		/**
+	     *  This is the API instancied to all module
+		 *  You can add api functionnality here
+	     */
 		stackJS.module.prototype.Api = function(sModule) {
 			return{
+				/**
+			     *  Enable a module to access other modules if allowed
+			     *  @param {Object} oDataCall - Address of the module you cant to call and data you want to pass
+			     */
 				bridgeCall:function(oDataCall){
-					if(this.checkPermission(sModule, oDataCall)){
+					if(this.checkPermission(sModule, oDataCall[0])){
 						return moduleData[oDataCall.Class[0]]["instance"][oDataCall.Class[1]][oDataCall.Class[2]](oDataCall.passData);
 					}
 				},
+				/**
+			     *  Enable a module to access other module class
+			     *  @param {Object} oDataCall - Address of the module you cant to call and data you want to pass
+			     */
 				callFunction: function(oDataCall){
 					if(stackJS.isset(moduleData[sModule],["instance",oDataCall.Class[0],oDataCall.Class[1]])){
 						return moduleData[sModule]["instance"][oDataCall.Class[0]][oDataCall.Class[1]](oDataCall.passData);
@@ -321,7 +351,12 @@ var stackJS = {
 						return false;
 					}
 				},
+				/**
+			     *  Enable a module to load another module if allowed
+			     *  @param {String} sNewModule - Module name you want to load
+			     */
 				loadModule : function(sNewModule){
+					if(!this.checkPermission(sModule, sNewModule)) return false;
 					if(moduleData.hasOwnProperty(sNewModule)){
 						console.systemLog("Module already loaded: " + sNewModule);
 						if(!moduleData[sNewModule].instance){
@@ -336,11 +371,20 @@ var stackJS = {
 					}
 					
 				}, 
+				/**
+			     *  Register destroy directive (DOM events or content to destroy)
+			     *  @param {Function} fCallback - Other destroy directive you want executed
+			     */
 				registerDestroy : function(fCallback) {
 					if (!destroyData[sModule]) destroyData[sModule] = [];
 					destroyData[sModule].push(fCallback)
 				},
+				/**
+			     *  Call the internal function to destroy module
+			     *  @param {String} sModuleToDestroy - Name of the module to destroy
+			     */
 				killModule : function(sModuleToDestroy){
+					if(!this.checkPermission(sModule, sModuleToDestroy)) return false;
 					if(moduleData.hasOwnProperty(sModuleToDestroy)){
 						destroy(sModuleToDestroy)
 						console.systemLog("Module killed: " + sModuleToDestroy);
@@ -349,22 +393,27 @@ var stackJS = {
 					}
 					
 				},
-				checkPermission : function(sModule, oDataCall){
-					if(typeof(window[stackJS.Conf.applicationName]["Conf"][sModule]["permissions"]) == "undefined"){
-						console.systemLog("Access denied to: " + oDataCall.Class[0])
+				/**
+			     *  Check if the module have the permissions to access other specific modules
+			     *  @param {String} sModule - Name of the module caller
+				 *  @param {String} oDataCall - Object representing the calling module
+			     */
+				checkPermission : function(sModuleCaller, sModuleCalling){
+					if(typeof(window[stackJS.Conf.applicationName]["Conf"][sModuleCaller]["permissions"]) == "undefined"){
+						console.systemLog("Access denied to: " + sModuleCalling)
 						console.systemLog("No permission set");
 						return false;
 					}else{
-						var sPermisions = window[stackJS.Conf.applicationName]["Conf"][sModule]["permissions"]
+						var sPermisions = window[stackJS.Conf.applicationName]["Conf"][sModuleCaller]["permissions"]
 						if(sPermisions == "*"){
-							 console.systemLog("Access Granted: " + oDataCall.Class[0]);
+							 console.systemLog("Access Granted: " + sModuleCalling);
 							return true
 						}else{
-							if(oDataCall.Class[0] in sPermisions) {
-								console.systemLog("Access Granted: " + oDataCall.Class[0]);
+							if(sModuleCalling in sPermisions) {
+								console.systemLog("Access Granted: " + sModuleCalling);
 								return true; 	
 							}else{
-								console.systemLog("Access denied to: " + oDataCall.Class[0])
+								console.systemLog("Access denied to: " + sModuleCalling)
 								console.systemLog("Check your configuration permissions, maybe you should not have access");
 								return false;
 							}

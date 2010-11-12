@@ -4,23 +4,24 @@
  * @author Cedric Dugas
  */
  Cooking.register(["Recipe","Controller"], function(api) {
- 
+	
+	
+	
 	return {
- 
 	 	/**
 	     * When the page loads, gets all recipes to be displayed.
 	     */
 	    load: function(){
- 		
+
 			var _this = this;
 			$("#addRecipeForm").bind(	"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
 			$(".destroyRecipe").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
 
 			this.getRecipe()
-			
 			api.registerDestroy(function (){
-				$("#addRecipeForm,.destroyRecipe").die();
-				$("#recipe").remove();
+				$(".destroyRecipe").die();
+				$("#addRecipeForm").unbind();
+				$("#recipeList").html("");
 			})
 	    },
 	 	/**
@@ -94,5 +95,6 @@
 	    }
 		
 	}
+
 })
 

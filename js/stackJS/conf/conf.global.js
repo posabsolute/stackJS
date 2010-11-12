@@ -38,12 +38,10 @@
 	stackJS.Conf.Extras = ["Sammy","Router"]
 	
 	stackJS.Conf.Extras.Sammy = {
-		jsPath : stackJS.Conf.jsPath + "sammy/",
-		file: "sammy-latest.min.js"
+		file: stackJS.Conf.stackJSpath + "sammy/min/sammy-latest.min.js"
 	}
 	stackJS.Conf.Extras.Router = {
-		jsPath : stackJS.Conf.configPath,
-		file: "router.js"
+		file: stackJS.Conf.configPath+"router.js"
 	}
 
 	stackJS.Conf.modules = ["Recipe", "Chef"]
