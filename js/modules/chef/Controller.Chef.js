@@ -44,9 +44,7 @@
 								Class:["View","showListChef"],
 								passData:aChefs
 							}))
-			$.publish("Chef.List.Loaded");	
-			api.killModule("Recipe");
-			api.loadModule("Recipe");			
+			$.publish("Chef.List.Loaded");				
 	    }
 		
 	

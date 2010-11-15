@@ -87,7 +87,7 @@ This file is the base configuration for your app.
         stackJS.loadFiles = [];	
         
         stackJS.modules = ["Recipe"] // load this modules, can be overwrited by loadModules in the html
-   })()
+    })()
 
 ## js/stackJS/conf/conf.modules.js
 
@@ -127,11 +127,9 @@ There will be no templating engine provided, I think it's your job to figure out
 
 You create new Class using the following structure:
 
-Cooking.register(["Chef","Controller"], function(api) {
-
-// your code
-	
-})
+    Cooking.register(["Chef","Controller"], function(api) {
+        // your code	
+    })
 
 This Class would be in the file Chef.Controller.js
 
@@ -183,7 +181,25 @@ You use Class to tell the class and method to call, and passData to pass data to
 
 You can load other module on the fly in your application with their dependencies using the command below,
 
-api.loadModule("moduleName", function(){ callBack() })
+    api.loadModule("moduleName", function(){ callBack() })
+
+
+## killing Modules
+
+You can kill module using this method,
+
+    api.killModule("moduleName")
+
+### Deleting events and others when killing module
+
+If you are going to kill a module, you will probably want to destroy some events and html at the same time. As this too custom for being automated stackJS proposed you to register on module load what you want to delete and it will automatically do it when you kill the module. Example:
+
+    api.registerDestroy(function (){
+        $(".destroyRecipe").die();
+        $("#addRecipeForm").unbind();
+        $("#recipeList").html("");
+    })
+
 
 # 3. Conventions
 stackJS have big hopes that you will follow some simple conventions to make code development and maintenance easier.
