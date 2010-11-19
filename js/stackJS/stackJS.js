@@ -21,9 +21,11 @@ var stackJS = {
 			var addConfParams = addConf[1].split(",")
 			window["stackJS"]["Conf"][addConf[0]] = addConfParams;
 		}
+		var reqJsPath = stackJS.Conf.stackJSpath + "requirejs/build/require/"
+		
 		this.insertJSfiles({
-			path:stackJS.Conf.stackJSpath,
-			file:'require.js',
+			path:reqJsPath,
+			file:'allplugins-require.js',
 			callback:function(){stackJS.loadConfiguration();}
 		})
 	},
@@ -37,6 +39,18 @@ var stackJS = {
 			stackJS.loadMVC();
 		});
 	},
+	/**
+     * Inject CSS files into the head
+     * @param {String} sFileInsert - Contains the url to insert the css file
+     * 
+     */
+	insertCSSfiles :function(sFileInsert){
+	    var link = document.createElement("link");
+	    link.type = "text/css";
+	    link.rel = "stylesheet";
+	    link.href = sFileInsert;
+	    document.getElementsByTagName("head")[0].appendChild(link);
+	},	
 	 /**
      * Inject javascript files into the head
      * @param {Object} oFileInsert - Contains the information to insert the js file
@@ -86,6 +100,14 @@ var stackJS = {
 			this.loadProduction();
 		}else{
 			this.loadLibrary();
+			
+			// We can't have information about CSS file loading (some browser just don't like it), so i just push them all directly throught here
+			if(stackJS.Conf.PluginsCSS){
+				for(var i=0; i<stackJS.Conf.PluginsCSS.length; i++){
+					this.insertCSSfiles(stackJS.Conf.PluginsCSS[i])	
+				}
+			}
+			
 		}
 	},
 	/**
@@ -187,15 +209,14 @@ var stackJS = {
 		var sModuleConfigPath = stackJS.Conf.configPath + "conf.modules.js"
 		require([sModuleConfigPath], function(e) {
 			console.systemLog("conf.modules.js loaded");
-			stackJS.confObserver() 
+			stackJS.confObserver();
 		});
 	},
 	/**
      *  Create base objects for the application
      */
 	loadModulesObjects : function(){
-		if(typeof(this.Conf.moduleClassNames) == "undefined") this.Conf.moduleClassNames = ['Model',"View","Controller"];
-		
+		if(typeof(this.Conf.moduleClassNames) == "undefined") this.Conf.moduleClassNames = ['Model',"View","Controller"];	
 	
 		window[stackJS.Conf.applicationName] = {};
 		window[stackJS.Conf.applicationName] = new stackJS.module;
@@ -210,8 +231,18 @@ var stackJS = {
 	moduleLoader : function(module){
 		
 		if(!window[stackJS.Conf.applicationName]["Conf"][module]) console.systemLog("cannot find configuations for module: " + module)
-		
+
 		var aDependenciesFiles = window[stackJS.Conf.applicationName]["Conf"][module]["dependencies"];
+		var aCSSDependenciesFiles = window[stackJS.Conf.applicationName]["Conf"][module]["CSSdependencies"];
+		
+		if(typeof(aCSSDependenciesFiles) != "undefined"){
+			// We can't have information about CSS file loading (some browser just don't like it), so stackJS just push them all directly throught here
+			if(aCSSDependenciesFiles){
+				for(var i=0; i<aCSSDependenciesFiles.length; i++){
+					this.insertCSSfiles(aCSSDependenciesFiles[i])	
+				}
+			}
+		}	
 		if(typeof(aDependenciesFiles) != "undefined"){
 			this.loadDependencies(aDependenciesFiles,module);
 		}else{
@@ -235,16 +266,19 @@ var stackJS = {
      */		
 	loadModuleFiles : function(sModule){
 		var aFilesModule = [];
+		
 		var aModuleClassNames = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleClassNames"];
 		if(aModuleClassNames){
-			var aLoadModuleFiles = window[stackJS.Conf.applicationName]["Conf"][sModule]["moduleClassNames"];
+			var aLoadModuleFiles = aModuleClassNames;
 		}else{
 			var aLoadModuleFiles = this.Conf.moduleClassNames;
 		}
+
 		for(var x in aLoadModuleFiles){		
-			var fileUrl = sModule.toLowerCase() + "/" +this.Conf.moduleClassNames[x]+ "." + sModule +  ".js";
+			var fileUrl = sModule.toLowerCase() + "/" +aLoadModuleFiles[x]+ "." + sModule +  ".js";
 			aFilesModule.push(this.Conf.modulePath + fileUrl);
 		}
+		
 		require(aFilesModule, function() {
 			console.systemLog("Module ready, instanciating: " + sModule);
 			window[stackJS.Conf.applicationName].start(sModule)
@@ -434,4 +468,4 @@ var stackJS = {
 };
 
 
-stackJS.init(); 
+stackJS.init();

@@ -24,6 +24,8 @@ Reference:
 What is stackJS?
 stackJS is a small javascript framework that try to not get in your way while still giving you tools to write good and maintainable code. It aims at moving the front-end logic from the back-end to the front-end
 
+[<img src="http://www.position-relative.net/pres/images/system.jpg">]
+
 ## Modules
 A module is an independent unit of functionality on the page that is comprised of business logic and most often some UI. For this reason, it helps to think of modules as a combination of HTML, CSS, and JavaScript that represents a single part of the page. 
 
@@ -45,10 +47,10 @@ No, not currently.
 
 Look at the file structure of the provided example. Open "js" then "modules", also open "stackJS" then "conf". 
 stackJS takes for granted that modules has their own folder and follow a simple file name structure.
-/moduleName/moduleName.Class.js
+/modulename/Class.ModuleName.js
 
 ## Files names
-stackJS use the class names Model, View, Controller but this is not by default. You could name them Mediators, ajax or anything else. The class names can be configured in the configuration files, both globally and  per module.
+stackJS use the class names Model, View, Controller by default but  you could name them Mediators, ajax or anything else. The class names can be configured in the configuration files, both globally and  per module and their is no maximum or minimums class's.
 
 in conf.global.js - you can use the StacJS.moduleClassNames to define those giving an array.
 in conf.modules.js - You can overwrite StacJS.moduleClassNames per module using : Conf.ModuleName.moduleClassNames 
@@ -81,7 +83,6 @@ This file is the base configuration for your app.
         stackJS.librarySource = 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js';	// Using a library? will be loaded first
         /* Load all your plugins dependencies here, they are loaded asynch for now */
         stackJS.Plugins = ['serializeObject.js','jquery.fixture.js'];
-        stackJS.pluginsLoadAsynch = true;  // load all plugins asynch, without any particular order
         
         // Internal framework Files
         stackJS.loadFiles = [];	
@@ -91,8 +92,14 @@ This file is the base configuration for your app.
 
 ## js/stackJS/conf/conf.modules.js
 
-Every module can dictate plugin dependencies before the module is loaded.
+Every module can dictate plugin dependencies before the module is loaded.You can keep the execution order of your plugin using !order, which is documented in requiredJS.
+
+Example: stackJS.Plugins = ['order!serializeObject.js','order!jquery.fixture.js'];
+
+
 You can also tell a different path to your module js files (can be useful when your js files are located in each modules folder of your php framework)
+
+
 
 
 Example:
