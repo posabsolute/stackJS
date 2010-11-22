@@ -7,7 +7,7 @@
 
 /* RECIPE CONFIG */
 Cooking.Conf.Recipe = {
-	//"moduleClassNames":["Model", "Controller", "View"],
+	"moduleClassNames":["Model", "View","Controller" ],
 	//"modulePathJS":"js/module/chef/",
 	// "permissions":["chef"],	
 	"dependencies":['js/utility/jquery.easing.1.3.js']
