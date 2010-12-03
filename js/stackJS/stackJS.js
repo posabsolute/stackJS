@@ -276,7 +276,7 @@ var stackJS = {
 
 		for(var x in aLoadModuleFiles){		
 			var fileUrl = sModule.toLowerCase() + "/" +aLoadModuleFiles[x]+ "." + sModule +  ".js";
-			aFilesModule.push(this.Conf.modulePath + fileUrl);
+			aFilesModule.push("order!"+this.Conf.modulePath + fileUrl);
 		}
 		
 		require(aFilesModule, function() {
