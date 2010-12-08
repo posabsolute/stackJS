@@ -1,11 +1,15 @@
-
+/**
+ * Get the chef list
+ * @namespace Chef, Model
+ * @author Cedric Dugas
+ */
 Cooking.register(["Chef","Model"], function(api) {
 
  
 	return {
     	 /**
-	     * get all recipe's data.
-	     * @param {String,Function} oParams - a callback that indicates the next controller function to call.
+	     * get all chef's data.
+	     * @param {Object} oParams - a callback that indicates the next controller function to call.
 	     */
 	   	getChef : function(oParams){
 	   		var _this =  this;

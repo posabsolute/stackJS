@@ -1,6 +1,6 @@
 /**
- * Recipe Module, control adding, deleting and modifying Chefs
- * 
+ * Control adding, deleting and modifying Chefs
+ * @namespace Chef, Controller
  * @author Cedric Dugas
  */
  Cooking.register(["Chef","Controller"], function(api) {

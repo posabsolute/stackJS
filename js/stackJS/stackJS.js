@@ -8,21 +8,14 @@ var stackJS = {
 	init: function(){
 		this.Conf = {};
 		this.loadRequireJS();
+		this.systemFiles = [];
+		this.systemFilesLoaded = false;
+		this.modulesFiles = [];
+		this.modulesFilesLoaded = false;
 	},
 	 /**	Load the require.js library that will handle files insertion */
 	loadRequireJS : function(){
-		
-		var jsSrc  = document.getElementById("stackJS").src;
-		var jsQry = jsSrc.substr(jsSrc.indexOf("?")+1)
-		var jsQry = jsQry.split("&")
-
-		for(var i in jsQry){
-			var addConf = jsQry[i].split("=");
-			var addConfParams = addConf[1].split(",")
-			window["stackJS"]["Conf"][addConf[0]] = addConfParams;
-		}
-		var reqJsPath = stackJS.Conf.stackJSpath + "requirejs/build/require/"
-		
+		var reqJsPath = APPCONFIG.stackJSpath + "requirejs/build/require/"
 		this.insertJSfiles({
 			path:reqJsPath,
 			file:'allplugins-require.js',
@@ -31,18 +24,35 @@ var stackJS = {
 	},
  	/**
  	 * Gets the params for the file url 
-     * Load the global conf files
+     * Load the conf files
      */
 	loadConfiguration : function(){
-		var globalConf = stackJS.Conf.stackJSpath + "conf/conf.global.js"
-		require([globalConf], function() {
+		var confFiles = [
+			"order!" + APPCONFIG.stackJSpath + "conf/conf.global.js",
+			"order!" + APPCONFIG.stackJSpath + "conf/bootstrap.js"
+		]	
+		require(confFiles, function() {
 			stackJS.loadMVC();
 		});
+	},
+	loadSystem : function(aFiles){	
+		if(!this.systemFilesLoaded){ // if onload page system files are not loaded, concat all files
+			stackJS.systemFiles = stackJS.systemFiles.concat(aFiles);	
+		}else{	// load directly new files once the framework is loaded
+			this.loadSystemFiles(aFiles)
+		}
+	},
+	loadModules : function(aFiles){	
+		if(!this.modulesFilesLoaded){ // if onload page system files are not loaded, concat all files
+			stackJS.modulesFiles = stackJS.modulesFiles.concat(aFiles);		
+		}else{	// load directly new files once the framework is loaded
+			this.loadModule(aFiles)
+		}
+		
 	},
 	/**
      * Inject CSS files into the head
      * @param {String} sFileInsert - Contains the url to insert the css file
-     * 
      */
 	insertCSSfiles :function(sFileInsert){
 	    var link = document.createElement("link");
@@ -99,15 +109,13 @@ var stackJS = {
 		if(stackJS.Conf.environement == "production"){
 			this.loadProduction();
 		}else{
-			this.loadLibrary();
-			
+			this.loadSystemFiles();			
 			// We can't have information about CSS file loading (some browser just don't like it), so i just push them all directly throught here
 			if(stackJS.Conf.PluginsCSS){
 				for(var i=0; i<stackJS.Conf.PluginsCSS.length; i++){
 					this.insertCSSfiles(stackJS.Conf.PluginsCSS[i])	
 				}
-			}
-			
+			}	
 		}
 	},
 	/**
@@ -133,8 +141,8 @@ var stackJS = {
 						}
 					}
 				}else{
-					console ={ log:function(caller){alert(caller)}};
-					console ={ systemLog:function(caller){alert(caller)}};
+					console ={ log:function(){}};
+					console ={ systemLog:function(caller){}};
 				}
 			}else{
 				if(this.Conf.systemLogs){
@@ -186,30 +194,28 @@ var stackJS = {
 	/**
      *  Load the javascript library of your choice
      */
-	loadLibrary: function(){
-		console.systemLog("Loading Library " + stackJS.Conf.librarySource);
-		
-		require([stackJS.Conf.librarySource], function() {
-			stackJS.loadPlugins();
-		});
-
+	loadSystemFiles: function(aFiles){
+		var loadedArray = 0;
+		console.systemLog("loading files:"); console.systemLog(stackJS.systemFiles);
+		if(!this.systemFilesLoaded){
+			require(stackJS.systemFiles, function() {
+				this.systemFilesLoaded = true;
+				stackJS.loadConfModules();
+				console.systemLog("System ready... loading MVC files");
+			});
+		}else{
+			require(aFiles, function() {});
+		}
 	},	
-	loadPlugins: function(){
-		stackJS.libraryLoad = true; 
-		require(stackJS.Conf.Plugins, function() {
-			console.systemLog("System ready... loading MVC files");
-			stackJS.loadModules()
-		});
-	},
 	/**
      *  Load modules object and configurations files
      */
-	loadModules: function(){
+	loadConfModules: function(){
 		this.loadModulesObjects();
 		var sModuleConfigPath = stackJS.Conf.configPath + "conf.modules.js"
 		require([sModuleConfigPath], function(e) {
 			console.systemLog("conf.modules.js loaded");
-			stackJS.confObserver();
+			stackJS.loadModule(stackJS.modulesFiles);
 		});
 	},
 	/**
@@ -222,14 +228,13 @@ var stackJS = {
 		window[stackJS.Conf.applicationName] = new stackJS.module;
 		window[stackJS.Conf.applicationName].Conf = {};
 	},		
-	confObserver: function(){
-		if(stackJS.Conf.loadModules) stackJS.Conf.modules = stackJS.Conf.loadModules;
-		for (var i in stackJS.Conf.modules){
-			this.moduleLoader(stackJS.Conf.modules[i]);
+	loadModule: function(modules){
+		this.modulesFilesLoaded = true; // too loate to add file to the page load array
+		for (var i in modules){
+			this.moduleLoader(modules[i]);
 		}
 	},
 	moduleLoader : function(module){
-		
 		if(!window[stackJS.Conf.applicationName]["Conf"][module]) console.systemLog("cannot find configuations for module: " + module)
 
 		var aDependenciesFiles = window[stackJS.Conf.applicationName]["Conf"][module]["dependencies"];
@@ -256,7 +261,8 @@ var stackJS = {
      */	
 	loadDependencies : function(aDependencies,sModule){
 		require(aDependencies, function() {
-				console.systemLog("dependencies loading complete for " + sModule);
+				console.systemLog("dependencies loading complete for " + sModule +":");
+				console.systemLog(aDependencies);
 				stackJS.loadModuleFiles(sModule);
 		});
 	},

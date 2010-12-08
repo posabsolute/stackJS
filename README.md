@@ -115,6 +115,45 @@ Example:
 * permissions take "*" or an array of module name as parameter, it enable you to call other modules
 * moduleClassNames are the file Class you want to add, you need to follow this pattern in the filename : ModuleName.Class.js 
 
+## bootstrap.js
+
+The boostrap file control what you want to load and when. You can load any array of external files by using stackJS.loadSystem(["file.js","file2.js"]).
+You can load module by using stackJS.loadModule(["file.js"])
+
+You could also use sammy in this file, but this is currently not supported.
+Example:
+
+    /**
+     * Javascript files and modules loader
+     * @author Cedric Dugas
+     */
+    
+    
+    /**
+     * Global setup and calls
+     * ----------------------------------------------------------------
+     */
+    
+    	stackJS.loadSystem(stackJS.Conf.librarySource);
+    	stackJS.loadSystem(stackJS.Conf.Plugins);
+    
+    	stackJS.loadModules([
+    		"Recipe",
+    		"Chef"
+    	]);
+    
+    /**
+     * Page-specific calls,
+     *	You could also use a router system for this, like sammy.js
+     * ----------------------------------------------------------------
+    */
+    
+    switch (APPCONFIG.page_id) {
+    
+      case 'home':
+    	// load modules for homepage
+        break;
+    }
 
 # 2.2 Using the framework
 
@@ -129,6 +168,8 @@ This is where you write all your code. Beside creating html string and templatin
 View:
 This is where your create your html strings that are returned to your controller to be added in the DOM.
 There will be no templating engine provided, I think it's your job to figure out what best work for you in that part.
+
+But you could use anything you want.
 
 # 2.3 Registering Modules
 

@@ -1,4 +1,8 @@
-
+/**
+ * Create the html to be added to the DOM
+ * @namespace Recipe, View
+ * @author Cedric Dugas
+ */
 Cooking.register(["Recipe","View"], function(api) {
 
  

@@ -1,6 +1,6 @@
 /**
  * Recipe Module, control adding, deleting and modifying recipes
- * 
+ * @namespace Recipe, Controller
  * @author Cedric Dugas
  */
  Cooking.register(["Recipe","Controller"], function(api) {
@@ -16,7 +16,7 @@
 			var _this = this;
 			$("#addRecipeForm").bind(	"submit", 	function(){ _this.onFormAddRecipeSubmit(this);	 	return false; });
 			$(".destroyRecipe").live(	"click", 	function(){ _this.onDestroyRecipeClick(this); 		return false; }); 
-
+			api.loadModule(['Chef'])
 			this.getRecipe()
 			api.registerDestroy(function (){
 				$(".destroyRecipe").die();

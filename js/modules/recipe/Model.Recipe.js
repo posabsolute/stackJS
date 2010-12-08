@@ -1,4 +1,8 @@
-
+/**
+ * Send ajax call and receive informations
+ * @namespace Recipe, Model
+ * @author Cedric Dugas
+ */
 Cooking.register(["Recipe","Model"], function(api) {
  
 
