@@ -49,6 +49,19 @@ Look at the file structure of the provided example. Open "js" then "modules", al
 stackJS takes for granted that modules has their own folder and follow a simple file name structure.
 /modulename/Class.ModuleName.js
 
+## In your HTML
+
+In your HTML file you need to add stackJS just before the body end, and add a APPCONFIG variable, mainly for telling the stackJS.js path.
+
+    <script>
+    	var APPCONFIG = {
+    		stackJSpath: "js/stackJS/",
+    		lang : 'fr',
+    		status:"debug"
+    	}
+    </script>
+    <script type="text/javascript" id="stackJS" src="js/stackJS/stackJS.js"></script>
+
 ## Files names
 stackJS use the class names Model, View, Controller by default but  you could name them Mediators, ajax or anything else. The class names can be configured in the configuration files, both globally and  per module and their is no maximum or minimums class's.
 
