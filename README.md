@@ -1,5 +1,6 @@
-
 stackJS beta 0.5
+
+* Please do not use, it was fun creating a small module loader but this project has never been tested in a production environement and never will (Last time I worked on it was 2010).
 
 
 Reference:
